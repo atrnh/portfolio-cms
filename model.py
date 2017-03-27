@@ -57,6 +57,30 @@ class Project(db.Model):
         return '<Project id={id} title={title}'.format(self.id, self.title)
 
 
+class CategoryProject(db.Model):
+    """An association between a Category and Project."""
+
+    __tablename__ = 'categories_projects'
+
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    category_id = db.Column(db.ForeignKey('categories.id'))
+    project_id = db.Column(db.ForeignKey('projects.id'))
+
+    def __init__(self, category_id, project_id):
+        """Instantiate a CategoryProject."""
+
+        self.category_id = category_id
+        self.project_id = project_id
+
+    def __repr__(self):
+        """Nice representation of a CategoryProject."""
+
+        return ('<CategoryProject id={id} category_id={category_id}' +
+                'project_id={project_id}>').format(self.id,
+                                                   self.category_id,
+                                                   self.project_id)
+
+
 ##############################################################################
 # Helper functions
 
