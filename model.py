@@ -40,17 +40,21 @@ class Project(db.Model):
     date_created = db.Column(db.Date, nullable=True)
     date_updated = db.Column(db.DateTime)
 
-    main_img = db.Column(db.ForeignKey('media.id'))
+    main_img_id = db.Column(db.ForeignKey('media.id'))
+    main_img = db.relationship('Media')
+
     categories = db.relationship('Category', secondary='categories_projects')
     tags = db.relationship('Tag', secondary='tags_projects')
+    media = db.relationship('Media', secondary='projects_media')
 
-    def __init__(self, title, desc=None, date_created=None):
+    def __init__(self, title, main_img_id, desc=None, date_created=None):
         """Instantiate a Project."""
 
         self.title = title
         self.desc = desc
         self.date_created = date_created
         self.date_updated = datetime.now()
+        self.main_img_id = main_img_id
 
     def __repr__(self):
         """Nice representation of Project."""
@@ -78,6 +82,14 @@ class Tag(db.Model):
         return '<Tag code={}'.format(self.code)
 
 
+class Media(db.Model):
+    """An image or embedded video."""
+
+    __tablename__ = 'media'
+
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+
+
 class CategoryProject(db.Model):
     """An association between a Category and Project."""
 
@@ -96,10 +108,11 @@ class CategoryProject(db.Model):
     def __repr__(self):
         """Nice representation of a CategoryProject."""
 
-        return ('<CategoryProject id={id} category_id={category_id}' +
-                'project_id={project_id}>').format(self.id,
-                                                   self.category_id,
-                                                   self.project_id)
+        return ('<CategoryProject id={id} category_id={category_id} ' +
+                'project_id={project_id}>').format(id=self.id,
+                                                   category_id=self.category_id,
+                                                   project_id=self.project_id,
+                                                   )
 
 
 class TagProject(db.Model):
@@ -107,6 +120,24 @@ class TagProject(db.Model):
 
     __tablename__ = 'tags_projects'
 
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    project_id = db.Column(db.ForeignKey('projects.id'))
+    tag_code = db.Column(db.ForeignKey('tags.code'))
+
+    def __init__(self, project_id, tag_code):
+        """Instantiate a TagProject."""
+
+        self.project_id = project_id
+        self.tag_code = tag_code
+
+    def __repr__(self):
+        """Nice representation of a TagProject."""
+
+        return ('<TagProject id={id} project_id={project_id} ' +
+                'tag_code={tag_code}').format(id=self.id,
+                                              project_id=self.project_id,
+                                              tag_code=self.tag_code,
+                                              )
 
 ##############################################################################
 # Helper functions
