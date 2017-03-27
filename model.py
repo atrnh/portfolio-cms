@@ -57,6 +57,24 @@ class Project(db.Model):
         return '<Project id={id} title={title}'.format(self.id, self.title)
 
 
+class Tag(db.Model):
+    """A tag."""
+
+    __tablename__ = 'tags'
+
+    code = db.Column(db.String(50), primary_key=True)
+
+    def __init__(self, code):
+        """Instantiate a Tag."""
+
+        self.code = code
+
+    def __repr__(self):
+        """Nice representation of a Tag."""
+
+        return '<Tag code={}'.format(self.code)
+
+
 class CategoryProject(db.Model):
     """An association between a Category and Project."""
 
@@ -79,6 +97,12 @@ class CategoryProject(db.Model):
                 'project_id={project_id}>').format(self.id,
                                                    self.category_id,
                                                    self.project_id)
+
+
+class TagProject(db.Model):
+    """An association between a Tag and Project."""
+
+    pass
 
 
 ##############################################################################
