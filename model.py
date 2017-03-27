@@ -13,7 +13,7 @@ class Category(db.Model):
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     title = db.Column(db.String(100))
-    desc = db.Column(db.String(500), nullable=True)
+    desc = db.Column(db.Text, nullable=True)
 
     projects = db.relationship('Project', secondary='categories_projects')
 
@@ -36,7 +36,7 @@ class Project(db.Model):
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     title = db.Column(db.String(100))
-    desc = db.Column(db.String(500), nullable=True)
+    desc = db.Column(db.Text, nullable=True)
     date_created = db.Column(db.Date, nullable=True)
     date_updated = db.Column(db.DateTime)
 
@@ -88,6 +88,22 @@ class Media(db.Model):
     __tablename__ = 'media'
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    title = db.Column(db.String(100))
+    desc = db.Column(db.Text, nullable=True)
+    date_updated = db.Column(db.DateTime)
+    source_url = db.Column(db.String(70))
+
+    def __init__(self, title, source_url, desc=None):
+        """Instantiate a Media."""
+
+        self.title = title
+        self.source_url = source_url
+        self.desc = desc
+        self.date_updated = datetime.now()
+
+
+class Thumbnail(db.Model):
+    pass
 
 
 class CategoryProject(db.Model):
@@ -138,6 +154,7 @@ class TagProject(db.Model):
                                               project_id=self.project_id,
                                               tag_code=self.tag_code,
                                               )
+
 
 ##############################################################################
 # Helper functions
