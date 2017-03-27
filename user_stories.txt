@@ -1,0 +1,38 @@
+===========PUBLIC VISITORS=====================================================
+  These are users who are visiting the portfolio page in order to view it.
+
+As a visitor, I would like to view the first page of most recent projects (the first 5 latest updates)
+
+As a visitor, I would like to view all the projects (seeing them as a thumbnail and title) under a particular category.
+
+As a visitor, I would like to see that the category I am viewing is highlighted (Front end)
+
+As a visitor, I would like to click a category to view all the projects under that category (Front end)
+
+As a visitor, I would like to click on a project to navigate to that project's page
+
+As a visitor, I would like to see that project page's description and tags.
+
+As a visitor I would like to see the project page's images and their descriptions
+
+As a visitor I would like to click on a tag to see its associated projects
+
+
+===========ADMIN===============================================================
+  The admin is the owner of the portfolio - the artist/designer.
+
+As an admin, I would like to have an admin login
+
+As an admin, I would like to see a dashboard after I login
+
+As an admin, I would like to add new categories
+
+As an admin, I would like to add new projects and set them under certain categories
+
+As an admin, I would like to see all the projects I have under particular categories
+
+As an admin, I would like to set different tags for a project
+
+As an admin, I would like to edit a project and its description, as well as its media and captions
+
+As an admin, I would like to upload/embed new media, add a description (or not) and set/upload a thumbnail 
