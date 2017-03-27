@@ -1,6 +1,7 @@
 """Data model for Portfolio CMS."""
 
 from flask_sqlalchemy import SQLAlchemy
+from datetime import datetime
 
 db = SQLAlchemy()
 
@@ -42,6 +43,19 @@ class Project(db.Model):
     main_img = db.Column(db.ForeignKey('media.id'))
     categories = db.relationship('Category', secondary='categories_projects')
 
+    def __init__(self, title, desc=None, date_created=None):
+        """Instantiate a Project."""
+
+        self.title = title
+        self.desc = desc
+        self.date_created = date_created
+        self.date_updated = datetime.now()
+
+    def __repr__(self):
+        """Nice representation of Project."""
+
+        return '<Project id={id} title={title}'.format(self.id, self.title)
+
 
 ##############################################################################
 # Helper functions
@@ -54,6 +68,7 @@ def connect_to_db(app):
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     db.app = app
     db.init_app(app)
+
 
 if __name__ == "__main__":
     # As a convenience, if we run this module interactively, it will leave
