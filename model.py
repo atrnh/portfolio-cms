@@ -14,11 +14,33 @@ class Category(db.Model):
     title = db.Column(db.String(100))
     desc = db.Column(db.String(500), nullable=True)
 
+    projects = db.relationship('Project', secondary='categories_projects')
+
     def __init__(self, title, desc=None):
         """Instantiate a Category."""
 
         self.title = title
         self.desc = desc
+
+    def __repr__(self):
+        """Nice represenation of Category."""
+
+        return '<Category id={id} title={title}'.format(self.id, self.title)
+
+
+class Project(db.Model):
+    """A project."""
+
+    __tablename__ = 'projects'
+
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    title = db.Column(db.String(100))
+    desc = db.Column(db.String(500), nullable=True)
+    date_created = db.Column(db.Date, nullable=True)
+    date_updated = db.Column(db.DateTime)
+
+    main_img = db.Column(db.ForeignKey('media.id'))
+    categories = db.relationship('Category', secondary='categories_projects')
 
 
 ##############################################################################
