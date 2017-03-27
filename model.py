@@ -42,6 +42,7 @@ class Project(db.Model):
 
     main_img = db.Column(db.ForeignKey('media.id'))
     categories = db.relationship('Category', secondary='categories_projects')
+    tags = db.relationship('Tag', secondary='tags_projects')
 
     def __init__(self, title, desc=None, date_created=None):
         """Instantiate a Project."""
@@ -63,6 +64,8 @@ class Tag(db.Model):
     __tablename__ = 'tags'
 
     code = db.Column(db.String(50), primary_key=True)
+
+    projects = db.relationship('Project', secondary='tags_projects')
 
     def __init__(self, code):
         """Instantiate a Tag."""
@@ -102,7 +105,7 @@ class CategoryProject(db.Model):
 class TagProject(db.Model):
     """An association between a Tag and Project."""
 
-    pass
+    __tablename__ = 'tags_projects'
 
 
 ##############################################################################
