@@ -2,6 +2,7 @@
 
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
+from sqlalchemy.sql import func
 
 db = SQLAlchemy()
 
@@ -26,7 +27,9 @@ class Category(db.Model):
     def __repr__(self):
         """Nice represenation of Category."""
 
-        return '<Category id={id} title={title}'.format(self.id, self.title)
+        return '<Category id={id} title={title}>'.format(id=self.id,
+                                                         title=self.title,
+                                                         )
 
 
 class Project(db.Model):
@@ -38,28 +41,35 @@ class Project(db.Model):
     title = db.Column(db.String(100))
     desc = db.Column(db.Text, nullable=True)
     date_created = db.Column(db.Date, nullable=True)
-    date_updated = db.Column(db.DateTime)
+    date_updated = db.Column(db.DateTime(timezone=True),
+                             server_default=func.now(),
+                             onupdate=func.now(),
+                             )
 
-    main_img_id = db.Column(db.Integer, db.ForeignKey('media.id'))
+    main_img_id = db.Column(db.Integer,
+                            db.ForeignKey('media.id'),
+                            nullable=True,
+                            )
     main_img = db.relationship('Media')
 
     categories = db.relationship('Category', secondary='categories_projects')
     tags = db.relationship('Tag', secondary='tags_projects')
     media = db.relationship('Media', secondary='projects_media')
 
-    def __init__(self, title, main_img_id, desc=None, date_created=None):
+    def __init__(self, title, main_img_id=None, desc=None, date_created=None):
         """Instantiate a Project."""
 
         self.title = title
         self.desc = desc
         self.date_created = date_created
-        self.date_updated = datetime.now()
         self.main_img_id = main_img_id
 
     def __repr__(self):
         """Nice representation of Project."""
 
-        return '<Project id={id} title={title}'.format(self.id, self.title)
+        return '<Project id={id} title={title}>'.format(id=self.id,
+                                                        title=self.title,
+                                                        )
 
 
 class Tag(db.Model):
@@ -79,7 +89,7 @@ class Tag(db.Model):
     def __repr__(self):
         """Nice representation of a Tag."""
 
-        return '<Tag code={}'.format(self.code)
+        return '<Tag code={}>'.format(self.code)
 
 
 class Media(db.Model):
@@ -90,7 +100,10 @@ class Media(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     title = db.Column(db.String(100))
     desc = db.Column(db.Text, nullable=True)
-    date_updated = db.Column(db.DateTime)
+    date_updated = db.Column(db.DateTime(timezone=True),
+                             server_default=func.now(),
+                             onupdate=func.now(),
+                             )
     source_url = db.Column(db.String(70))
     thumbnail_id = db.Column(db.Integer,
                              db.ForeignKey('thumbnails.id'),
@@ -107,7 +120,6 @@ class Media(db.Model):
         self.title = title
         self.source_url = source_url
         self.desc = desc
-        self.date_updated = datetime.now()
 
     def __repr__(self):
         """Nice representation of a Media."""
@@ -125,21 +137,15 @@ class Thumbnail(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     source_url = db.Column(db.String(70))
 
-    media = db.relationship('Media')
-
-    def __init__(self, source_url, media_id):
+    def __init__(self, source_url):
         """Instantiate a Thumbnail."""
 
         self.source_url = source_url
-        self.media_id = media_id
 
     def __repr__(self):
         """Nice represenation of a Thumbnail."""
 
-        return ('<Thumbnail id={id} ' +
-                'media_id={media_id}').format(id=self.id,
-                                              media_id=self.media_id,
-                                              )
+        return '<Thumbnail id={id}>'.format(id=self.id)
 
 
 class ProjectMedia(db.Model):
@@ -161,10 +167,10 @@ class ProjectMedia(db.Model):
         """Nice representation of a ProjectMedia."""
 
         return ('<ProjectMedia id={id} project_id={project_id} ' +
-                'media_id={media_id}').format(id=self.id,
-                                              project_id=self.project_id,
-                                              media_id=self.media_id,
-                                              )
+                'media_id={media_id}>').format(id=self.id,
+                                               project_id=self.project_id,
+                                               media_id=self.media_id,
+                                               )
 
 
 class CategoryProject(db.Model):
@@ -220,14 +226,27 @@ class TagProject(db.Model):
 ##############################################################################
 # Helper functions
 
-def connect_to_db(app):
+def connect_to_db(app, db_uri='postgresql:///portfolio'):
     """Connect the database to our Flask app."""
 
     # Configure to use our PstgreSQL database
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///portfolio'
+    app.config['SQLALCHEMY_DATABASE_URI'] = db_uri
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     db.app = app
     db.init_app(app)
+
+
+def example_data():
+    """Create example data for testing."""
+
+    c = Category('Test Category', 'This is a test category.')
+    m = Media('Test Img', 'test.jpg', 'This is a test image.')
+    p = Project('Test Project', desc='This is a test project.')
+    tg = Tag('test-tag')
+    th = Thumbnail('test_thumbnail.jpg')
+
+    db.session.add_all([c, m, p, tg, th])
+    db.session.commit()
 
 
 if __name__ == "__main__":
@@ -235,5 +254,5 @@ if __name__ == "__main__":
     # you in a state of being able to work with the database directly.
 
     from server import app
-    connect_to_db(app)
+    connect_to_db(app, 'postgresql:///testdb')
     print "Connected to DB."
