@@ -40,7 +40,7 @@ class Project(db.Model):
     date_created = db.Column(db.Date, nullable=True)
     date_updated = db.Column(db.DateTime)
 
-    main_img_id = db.Column(db.ForeignKey('media.id'))
+    main_img_id = db.Column(db.Integer, db.ForeignKey('media.id'))
     main_img = db.relationship('Media')
 
     categories = db.relationship('Category', secondary='categories_projects')
@@ -92,6 +92,14 @@ class Media(db.Model):
     desc = db.Column(db.Text, nullable=True)
     date_updated = db.Column(db.DateTime)
     source_url = db.Column(db.String(70))
+    thumbnail_id = db.Column(db.Integer,
+                             db.ForeignKey('thumbnails.id'),
+                             nullable=True,
+                             )
+
+    thumbnail = db.relationship('Thumbnail')
+
+    projects = db.relationship('Media', secondary='projects_media')
 
     def __init__(self, title, source_url, desc=None):
         """Instantiate a Media."""
@@ -101,9 +109,62 @@ class Media(db.Model):
         self.desc = desc
         self.date_updated = datetime.now()
 
+    def __repr__(self):
+        """Nice representation of a Media."""
+
+        return '<Media id={id} title={title}>'.format(id=self.id,
+                                                      title=self.title,
+                                                      )
+
 
 class Thumbnail(db.Model):
-    pass
+    """A thumbnail."""
+
+    __tablename__ = 'thumbnails'
+
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    source_url = db.Column(db.String(70))
+
+    media = db.relationship('Media')
+
+    def __init__(self, source_url, media_id):
+        """Instantiate a Thumbnail."""
+
+        self.source_url = source_url
+        self.media_id = media_id
+
+    def __repr__(self):
+        """Nice represenation of a Thumbnail."""
+
+        return ('<Thumbnail id={id} ' +
+                'media_id={media_id}').format(id=self.id,
+                                              media_id=self.media_id,
+                                              )
+
+
+class ProjectMedia(db.Model):
+    """An association between a Project and Media."""
+
+    __tablename__ = 'projects_media'
+
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    project_id = db.Column(db.Integer, db.ForeignKey('projects.id'))
+    media_id = db.Column(db.Integer, db.ForeignKey('media.id'))
+
+    def __init__(self, project_id, media_id):
+        """Instantiate a ProjectMedia."""
+
+        self.project_id = project_id
+        self.media_id = media_id
+
+    def __repr__(self):
+        """Nice representation of a ProjectMedia."""
+
+        return ('<ProjectMedia id={id} project_id={project_id} ' +
+                'media_id={media_id}').format(id=self.id,
+                                              project_id=self.project_id,
+                                              media_id=self.media_id,
+                                              )
 
 
 class CategoryProject(db.Model):
@@ -112,8 +173,8 @@ class CategoryProject(db.Model):
     __tablename__ = 'categories_projects'
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    category_id = db.Column(db.ForeignKey('categories.id'))
-    project_id = db.Column(db.ForeignKey('projects.id'))
+    category_id = db.Column(db.Integer, db.ForeignKey('categories.id'))
+    project_id = db.Column(db.Integer, db.ForeignKey('projects.id'))
 
     def __init__(self, category_id, project_id):
         """Instantiate a CategoryProject."""
@@ -137,8 +198,8 @@ class TagProject(db.Model):
     __tablename__ = 'tags_projects'
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    project_id = db.Column(db.ForeignKey('projects.id'))
-    tag_code = db.Column(db.ForeignKey('tags.code'))
+    project_id = db.Column(db.Integer, db.ForeignKey('projects.id'))
+    tag_code = db.Column(db.String(50), db.ForeignKey('tags.code'))
 
     def __init__(self, project_id, tag_code):
         """Instantiate a TagProject."""
@@ -150,10 +211,10 @@ class TagProject(db.Model):
         """Nice representation of a TagProject."""
 
         return ('<TagProject id={id} project_id={project_id} ' +
-                'tag_code={tag_code}').format(id=self.id,
-                                              project_id=self.project_id,
-                                              tag_code=self.tag_code,
-                                              )
+                'tag_code={tag_code}>').format(id=self.id,
+                                               project_id=self.project_id,
+                                               tag_code=self.tag_code,
+                                               )
 
 
 ##############################################################################
@@ -163,7 +224,7 @@ def connect_to_db(app):
     """Connect the database to our Flask app."""
 
     # Configure to use our PstgreSQL database
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///kanban'
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///portfolio'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     db.app = app
     db.init_app(app)
