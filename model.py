@@ -239,13 +239,33 @@ def connect_to_db(app, db_uri='postgresql:///portfolio'):
 def example_data():
     """Create example data for testing."""
 
-    c = Category('Test Category', 'This is a test category.')
-    m = Media('Test Img', 'test.jpg', 'This is a test image.')
-    p = Project('Test Project', desc='This is a test project.')
-    tg = Tag('test-tag')
-    th = Thumbnail('test_thumbnail.jpg')
+    c0 = Category('Test', 'This is a test category.')
+    c1 = Category('Sculptures', 'Another test category of wonderful sculptures.')
+    c2 = Category('Photos', 'Test another category of cool photos.')
+    db.session.add_all([c0, c1, c2])
+    db.session.commit()
 
-    db.session.add_all([c, m, p, tg, th])
+    m0 = Media('Test Image', 'test.jpg', 'This is a test image.')
+    m1 = Media('Test Cat', 'cat.jpg', 'Test image of a cat.')
+    m2 = Media('Test Sculpture', 'sculpture.jpg', 'A test sculpture.')
+    m3 = Media('Cool Test', 'cool.jpg', 'Another fake, test image.')
+    db.session.add_all([m0, m1, m2, m3])
+    db.session.commit()
+
+    p0 = Project('Test Project', desc='This is a test project.')
+    p1 = Project('Cool Cats', desc='Test project about cool cats.')
+    db.session.add_all([p0, p1])
+    db.session.commit()
+
+    tg = Tag('test-tag')
+    db.session.add(tg)
+    db.session.commit()
+
+    th0 = Thumbnail('test_thumb.jpg')
+    th1 = Thumbnail('cat_thumb.jpg')
+    th2 = Thumbnail('sculpture_thumb.jpg')
+    th3 = Thumbnail('cool_thumb.jpg')
+    db.session.add_all([th0, th1, th2, th3])
     db.session.commit()
 
 
