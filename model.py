@@ -41,7 +41,7 @@ class JSONMixin(object):
             '{prefix}-{pk}'.format(
                 prefix=prefix,
                 pk=inspect(child).identity[0]
-            ): child.get_attributes
+            ): child.get_attributes()
             for child in children
         }
 
@@ -120,7 +120,7 @@ class Project(db.Model, JSONMixin):
                                                         )
 
 
-class Tag(db.Model):
+class Tag(db.Model, JSONMixin):
     """A tag."""
 
     __tablename__ = 'tags'
@@ -140,7 +140,7 @@ class Tag(db.Model):
         return '<Tag code={}>'.format(self.code)
 
 
-class Media(db.Model):
+class Media(db.Model, JSONMixin):
     """An image or embedded video."""
 
     __tablename__ = 'media'
