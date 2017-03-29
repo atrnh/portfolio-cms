@@ -31,6 +31,15 @@ class Category(db.Model):
                                                          title=self.title,
                                                          )
 
+    def get_projects_dict(self):
+        """Public attributes of all projects in category."""
+
+        # TODO: Replace vars() with something else
+
+        return {('project-' + str(project.id)): dict(vars(project))
+                for project in self.projects
+                }
+
 
 class Project(db.Model):
     """A project."""
