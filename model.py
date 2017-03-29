@@ -3,11 +3,39 @@
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 from sqlalchemy.sql import func
+from sqlalchemy.inspection import inspect
 
 db = SQLAlchemy()
 
 
-class Category(db.Model):
+class JsonMixin(object):
+    """JSON helper mixins."""
+
+    def get_attributes(self):
+        """Get the attributes of an instance and their values.
+
+        Does not include private attributes.
+        """
+
+        return {attribute: self.__dict__[attribute]
+                for attribute in self.__dict__
+                if not attribute.startswith('_')
+                }
+
+    def get_children_dict(self, children, prefix):
+        """Return a dictionary of instance's children.
+
+        Keys are a string of prefix, followed by a hyphen
+        and the primary key of the child. Values are a
+        dictionary of children's attributes and values
+        of attributes.
+        """
+
+        return {'{prefix}-{pk}'.format(prefix=prefix,
+                                       pk=)}
+
+
+class Category(db.Model, JsonMixin):
     """A category."""
 
     __tablename__ = 'categories'
