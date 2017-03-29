@@ -8,7 +8,13 @@ from sqlalchemy.inspection import inspect
 db = SQLAlchemy()
 
 
-class JsonMixin(object):
+class DBMixin(object):
+    """Database helper mixins."""
+
+    pass
+
+
+class JSONMixin(object):
     """JSON helper mixins."""
 
     def get_attributes(self):
@@ -31,11 +37,16 @@ class JsonMixin(object):
         of attributes.
         """
 
-        return {'{prefix}-{pk}'.format(prefix=prefix,
-                                       pk=)}
+        return {
+            '{prefix}-{pk}'.format(
+                prefix=prefix,
+                pk=inspect(child).identity[0]
+            ): child.get_attributes
+            for child in children
+        }
 
 
-class Category(db.Model, JsonMixin):
+class Category(db.Model, JSONMixin):
     """A category."""
 
     __tablename__ = 'categories'
@@ -69,7 +80,7 @@ class Category(db.Model, JsonMixin):
                 }
 
 
-class Project(db.Model):
+class Project(db.Model, JSONMixin):
     """A project."""
 
     __tablename__ = 'projects'
