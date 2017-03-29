@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Portfolio{% endblock %}
+
+{% block content %}
+  {% if categories %}
+    <ul>
+      {% for category in categories %}
+        <li>
+          <a href="/{{ category.title }}">{{ category.title }}</a>
+        </li>
+        {% if category.projects %}
+          <ul>
+            {% for project in category.projects %}
+              <li>{{ project.title }}</li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+      {% endfor %}
+    </ul>
+  {% endif %}
+{% endblock %}
