@@ -1,9 +1,10 @@
 """Server for Portfolio CMS."""
 
 from jinja2 import StrictUndefined
-from flask import Flask
+from flask import (Flask, render_template,)
 from flask_debugtoolbar import DebugToolbarExtension
-from model import connect_to_db
+from model import (Category, Project, Tag, Media, Thumbnail, ProjectMedia,
+                   CategoryProject, TagProject, db, connect_to_db,)
 
 app = Flask(__name__)
 
@@ -14,6 +15,41 @@ app.secret_key = 'ABC'
 # silently. This is horrible. Fix this so that, instead, it raises an
 # error.
 app.jinja_env.undefined = StrictUndefined
+
+
+@app.route('/')
+def index():
+    """Homepage.
+
+    Display all categories and their projects in the database.
+    """
+
+    categories = Category.query.options(db.joinedload('projects')).all()
+
+    return render_template('index.html', categories=categories)
+
+
+@app.route('/<category_title>')
+def view_category(category_title):
+    """Category page.
+
+    Display all the projects under a particular category.
+    """
+
+    category = Category.query.options(db.joinedload('projects')
+                                      ).filter_by(title=category_title).one()
+
+    return render_template('category.html', category=category)
+
+
+@app.route('/<category_title>/<project_title>/<project_id>')
+def view_project(category_title, project_title, project_id):
+    """Display project info."""
+
+    project = Project.query.get(project_id)
+
+    return render_template('project.html', project=project)
+
 
 if __name__ == '__main__':
     app.debug = True
