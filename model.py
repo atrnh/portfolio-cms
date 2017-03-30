@@ -1,5 +1,3 @@
-"""Data model for Portfolio CMS."""
-
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 from sqlalchemy.sql import func
@@ -8,42 +6,57 @@ from sqlalchemy.inspection import inspect
 db = SQLAlchemy()
 
 
-class DBMixin(object):
-    """Database helper mixins."""
-
-    pass
+# class DBMixin(object):
+#     """Database helper mixins."""
+#
+#     pass
 
 
 class JSONMixin(object):
     """JSON helper mixins."""
 
-    def get_attributes(self):
-        """Get the attributes of an instance and their values.
+    @staticmethod
+    def get_json_from_list(instances, prefix):
+        """Return JSON from a list of instances.
 
-        Does not include private attributes.
-        """
-
-        return {attribute: self.__dict__[attribute]
-                for attribute in self.__dict__
-                if not attribute.startswith('_')
-                }
-
-    def get_children_dict(self, children, prefix):
-        """Return a dictionary of instance's children.
-
-        Keys are a string of prefix, followed by a hyphen
-        and the primary key of the child. Values are a
-        dictionary of children's attributes and values
-        of attributes.
+        Keys are a string of prefix, followed by a hyphen and the primary key
+        of the child. Values are a dictionary of children's attributes and
+        values of attributes.
         """
 
         return {
-            '{prefix}-{pk}'.format(
+            '{prefix}_{pk}'.format(
                 prefix=prefix,
-                pk=inspect(child).identity[0]
-            ): child.get_attributes()
-            for child in children
+                pk=inspect(instance).identity[0]
+            ): instance.get_attributes()
+            for instance in instances
         }
+
+    def get_attributes(self):
+        """Get the attributes of an instance and their values.
+
+        Does not include private attributes or attributes containing database
+        objects.
+        """
+
+        attributes = {}
+
+        for attribute, value in self.__dict__.iteritems():
+            if not attribute.startswith('_'):
+                if type(value) is datetime:
+                    attributes[attribute] = value.isoformat()
+                elif isinstance(value, list):
+                    try:
+                        attributes[attribute] = self.get_json_from_list(
+                            value,
+                            value[0].__class__.__name__.lower()
+                        )
+                    except IndexError:
+                        attributes[attribute] = {}
+                else:
+                    attributes[attribute] = value
+
+        return attributes
 
 
 class Category(db.Model, JSONMixin):
@@ -69,15 +82,6 @@ class Category(db.Model, JSONMixin):
         return '<Category id={id} title={title}>'.format(id=self.id,
                                                          title=self.title,
                                                          )
-
-    def get_projects_dict(self):
-        """Public attributes of all projects in category."""
-
-        # TODO: Replace vars() with something else
-
-        return {('project-' + str(project.id)): dict(vars(project))
-                for project in self.projects
-                }
 
 
 class Project(db.Model, JSONMixin):
