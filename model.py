@@ -17,19 +17,30 @@ class JSONMixin(object):
 
     @staticmethod
     def get_json_from_list(instances, prefix):
-        """Return JSON from a list of instances.
+        """Return JSON of a list of instances.
 
-        Keys are a string of prefix, followed by a hyphen and the primary key
-        of the child. Values are a dictionary of children's attributes and
-        values of attributes.
+        Key is the name of the instances' table and value is a list containing
+        JSON of those instances.
         """
 
+        # return {
+        #     '{prefix}_{pk}'.format(
+        #         prefix=prefix,
+        #         pk=inspect(instance).identity[0]
+        #     ): instance.get_attributes()
+        #     for instance in instances
+        # }
+
         return {
-            '{prefix}_{pk}'.format(
-                prefix=prefix,
-                pk=inspect(instance).identity[0]
-            ): instance.get_attributes()
-            for instance in instances
+            '{tablename}'.format(tablename=instances[0].__tablename__): [
+                {
+                    '{prefix}_{pk}'.format(
+                        prefix=prefix,
+                        pk=inspect(instance).identity[0]
+                    ): instance.get_attributes()
+                }
+                for instance in instances
+            ]
         }
 
     def get_attributes(self):
@@ -52,7 +63,7 @@ class JSONMixin(object):
                             value[0].__class__.__name__.lower()
                         )
                     except IndexError:
-                        attributes[attribute] = {}
+                        attributes[attribute] = []
                 else:
                     attributes[attribute] = value
 
