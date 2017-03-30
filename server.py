@@ -1,7 +1,7 @@
 """Server for Portfolio CMS."""
 
 from jinja2 import StrictUndefined
-from flask import (Flask, render_template,)
+from flask import (Flask, render_template, jsonify)
 from flask_debugtoolbar import DebugToolbarExtension
 from model import (Category, Project, Tag, Media, Thumbnail, ProjectMedia,
                    CategoryProject, TagProject, db, connect_to_db,)
@@ -24,9 +24,19 @@ def index():
     Display all categories and their projects in the database.
     """
 
-    categories = Category.query.options(db.joinedload('projects')).all()
+    categories = Category.query.options(db.joinedload('projects')
+                                        ).all()
 
     return render_template('index.html', categories=categories)
+
+
+@app.route('/categories.json')
+def get_categories_json():
+
+    categories = Category.query.options(db.joinedload('projects')
+                                        ).all()
+
+    return jsonify(Category.get_json_from_list(categories, 'category'))
 
 
 @app.route('/<category_title>')
@@ -40,15 +50,15 @@ def view_category(category_title):
                                       ).filter_by(title=category_title).one()
 
     return render_template('category.html', category=category)
-
-
-@app.route('/<category_title>/<project_title>/<project_id>')
-def view_project(category_title, project_title, project_id):
-    """Display project info."""
-
-    project = Project.query.get(project_id)
-
-    return render_template('project.html', project=project)
+# 
+#
+# @app.route('/<category_title>/<project_title>/<project_id>')
+# def view_project(category_title, project_title, project_id):
+#     """Display project info."""
+#
+#     project = Project.query.get(project_id)
+#
+#     return render_template('project.html', project=project)
 
 
 if __name__ == '__main__':
