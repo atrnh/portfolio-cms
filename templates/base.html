@@ -2,10 +2,29 @@
 <html>
 <head>
   <title>{% block title %}{% endblock %}</title>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.8/angular.js"></script>
+  <script src="static/js/app.js"></script>
 </head>
 
-<body>
-  {% block content %}
-  {% endblock %}
+<body ng-app="portfolio">
+  <nav>
+    {% if categories %}
+      <ul>
+        {% for category in categories %}
+          <li>{{ category.title }}</li>
+          {% if category.projects %}
+            <ul>
+              {% for project in category.projects %}
+                <li>{{ project.title }}</li>
+              {% endfor %}
+            </ul>
+          {% endif %}
+        {% endfor %}
+      </ul>
+    {% endif %}
+  </nav>
+  <div ng-controller="NavController">{[{ foo }]}<br>
+    {[{ categories.category_1.title }]}
+  </div>
 </body>
 </html>
