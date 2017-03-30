@@ -39,28 +39,6 @@ def get_categories_json():
     return jsonify(Category.get_json_from_list(categories, 'category'))
 
 
-@app.route('/<category_title>')
-def view_category(category_title):
-    """Category page.
-
-    Display all the projects under a particular category.
-    """
-
-    category = Category.query.options(db.joinedload('projects')
-                                      ).filter_by(title=category_title).one()
-
-    return render_template('category.html', category=category)
-# 
-#
-# @app.route('/<category_title>/<project_title>/<project_id>')
-# def view_project(category_title, project_title, project_id):
-#     """Display project info."""
-#
-#     project = Project.query.get(project_id)
-#
-#     return render_template('project.html', project=project)
-
-
 if __name__ == '__main__':
     app.debug = True
     app.jinja_env.auto_reload = app.debug
