@@ -2,6 +2,7 @@ from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 from sqlalchemy.sql import func
 from sqlalchemy.inspection import inspect
+import json
 
 db = SQLAlchemy()
 
@@ -19,7 +20,9 @@ class JSONMixin(object):
     def get_json_from_list(instances):
         """Return JSON of a list of instances."""
 
-        return [instance.get_attributes() for instance in instances]
+        return json.dumps(
+            [instance.get_attributes() for instance in instances]
+        )
 
     def get_attributes(self):
         """Get the attributes of an instance and their values.

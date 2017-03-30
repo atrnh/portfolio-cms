@@ -1,7 +1,7 @@
 """Server for Portfolio CMS."""
 
 from jinja2 import StrictUndefined
-from flask import (Flask, render_template, jsonify)
+from flask import (Flask, render_template, Response)
 from flask_debugtoolbar import DebugToolbarExtension
 from model import (Category, Project, Tag, Media, Thumbnail, ProjectMedia,
                    CategoryProject, TagProject, db, connect_to_db,)
@@ -36,7 +36,9 @@ def get_categories_json():
     categories = Category.query.options(db.joinedload('projects')
                                         ).all()
 
-    return jsonify(Category.get_json_from_list(categories, 'category'))
+    return Response(Category.get_json_from_list(categories),
+                    mimetype='application/json'
+                    )
 
 
 if __name__ == '__main__':
