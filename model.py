@@ -16,32 +16,10 @@ class JSONMixin(object):
     """JSON helper mixins."""
 
     @staticmethod
-    def get_json_from_list(instances, prefix):
-        """Return JSON of a list of instances.
+    def get_json_from_list(instances):
+        """Return JSON of a list of instances."""
 
-        Key is the name of the instances' table and value is a list containing
-        JSON of those instances.
-        """
-
-        # return {
-        #     '{prefix}_{pk}'.format(
-        #         prefix=prefix,
-        #         pk=inspect(instance).identity[0]
-        #     ): instance.get_attributes()
-        #     for instance in instances
-        # }
-
-        return {
-            '{tablename}'.format(tablename=instances[0].__tablename__): [
-                {
-                    '{prefix}_{pk}'.format(
-                        prefix=prefix,
-                        pk=inspect(instance).identity[0]
-                    ): instance.get_attributes()
-                }
-                for instance in instances
-            ]
-        }
+        return [instance.get_attributes() for instance in instances]
 
     def get_attributes(self):
         """Get the attributes of an instance and their values.
@@ -59,8 +37,7 @@ class JSONMixin(object):
                 elif isinstance(value, list):
                     try:
                         attributes[attribute] = self.get_json_from_list(
-                            value,
-                            value[0].__class__.__name__.lower()
+                            value
                         )
                     except IndexError:
                         attributes[attribute] = []
