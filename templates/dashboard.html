@@ -1,0 +1,48 @@
+{% extends "base-admin.html" %}
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+  <div id="dashboard">
+    <h1>Dashboard</h1>
+    {% if categories %}
+      <ul>
+      {% for category in categories %}
+        <li>
+          {{ category.title }}
+          {% if category.desc %}
+            | {{ category.desc }}
+          {% endif %}
+        </li>
+        {% if category.projects %}
+          <ul>
+            {% for project in category.projects %}
+            <li>
+              {{ project.title }}
+            </li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+      {% endfor %}
+      </ul>
+    {% endif %}
+    <h2>New category</h2>
+    <form action="/new_category" method="POST">
+      <input type="text" name="title" placeholder="Title"></br>
+      <input type="text" name="desc" placeholder="Description"></br>
+      <input type="submit">
+    </form>
+    <h2>New project</h2>
+    <form action="/new_project" method="POST">
+      <input type="text" name="title" placeholder="Title"></br>
+      <input type="text" name="desc" placeholder = "Description"></br>
+      {% if categories %}
+        <select name="category_id">
+          {% for category in categories %}
+            <option value="{{ category.id }}">{{ category.title }}</option>
+          {% endfor %}
+        </select></br>
+      {% endif %}
+      <input type="submit">
+    </form>
+  </div>
+{% endblock %}

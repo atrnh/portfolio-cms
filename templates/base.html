@@ -3,6 +3,7 @@
 <head>
   <title>{% block title %}{% endblock %}</title>
   <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.8/angular.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.2/angular-route.js"></script>
   <script src="static/js/app.js"></script>
 </head>
 
@@ -11,7 +12,11 @@
     {% if categories %}
       <ul>
         {% for category in categories %}
-          <li>{{ category.title }}</li>
+          <li>
+            <a ng-click="updateView({{ category.id }})">
+              {{ category.title }}
+            </a>
+          </li>
           {% if category.projects %}
             <ul>
               {% for project in category.projects %}
@@ -23,8 +28,6 @@
       </ul>
     {% endif %}
   </nav>
-  <div ng-controller="NavController">{[{ foo }]}<br>
-    {[{ categories.category_1.title }]}
-  </div>
+  {% block content %}{% endblock %}
 </body>
 </html>
