@@ -25,7 +25,8 @@ def index():
     """
 
     categories = Category.query.options(db.joinedload('projects')
-                                        ).all()
+                                        ).order_by(Category.id
+                                                   ).all()
 
     return render_template('index.html', categories=categories)
 

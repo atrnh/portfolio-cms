@@ -27,8 +27,7 @@ class JSONMixin(object):
     def get_attributes(self):
         """Get the attributes of an instance and their values.
 
-        Does not include private attributes or attributes containing database
-        objects.
+        Does not include private attributes.
         """
 
         attributes = {}

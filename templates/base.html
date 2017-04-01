@@ -4,16 +4,18 @@
   <title>{% block title %}{% endblock %}</title>
   <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.8/angular.js"></script>
   <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.2/angular-route.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.2/angular-resource.js"></script>
   <script src="static/js/app.js"></script>
 </head>
 
-<body ng-app="portfolio">
+<body ng-app="portfolio" ng-controller="CategoryController">
   <nav>
     {% if categories %}
       <ul>
         {% for category in categories %}
           <li>
-            <a ng-click="updateView({{ category.id }})">
+            <a href="#/{{ category.title }}"
+               ng-click="updateView({{ category.id }})">
               {{ category.title }}
             </a>
           </li>

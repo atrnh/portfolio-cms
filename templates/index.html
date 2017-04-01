@@ -2,7 +2,12 @@
 {% block title %}Portfolio{% endblock %}
 
 {% block content %}
-hi
-{[{ update }]}
-{[{ test }]}
+<p>category id: {[{ update }]}</p>
+
+<ul>
+  <li ng-repeat="project in projects">
+    <span>{[{ project.id }]} {[{ project.title }]}</span>
+    <p>{[{ project.desc }]}</p>
+  </li>
+</ul>
 {% endblock %}
