@@ -7,12 +7,6 @@ import json
 db = SQLAlchemy()
 
 
-# class DBMixin(object):
-#     """Database helper mixins."""
-#
-#     pass
-
-
 class JSONMixin(object):
     """JSON helper mixins."""
 
@@ -21,7 +15,7 @@ class JSONMixin(object):
         """Return JSON of a list of instances."""
 
         return json.dumps(
-            [instance.get_attributes() for instance in instances]
+            [json.loads(instance.get_attributes()) for instance in instances]
         )
 
     def get_attributes(self):
@@ -38,15 +32,68 @@ class JSONMixin(object):
                     attributes[attribute] = value.isoformat()
                 elif isinstance(value, list):
                     try:
-                        attributes[attribute] = self.get_json_from_list(
-                            value
+                        # We want a Python list instead of a JSON string since
+                        # it will already get converted to JSON in
+                        # return statement
+                        attributes[attribute] = json.loads(
+                            self.get_json_from_list(value)
                         )
                     except IndexError:
                         attributes[attribute] = []
                 else:
                     attributes[attribute] = value
 
-        return attributes
+        return json.dumps(attributes)
+
+
+class Admin(db.Model):
+    """A user who can login and access the admin dashboard."""
+
+    __tablename__ = 'admins'
+
+    username = db.Column(db.String(40), primary_key=True)
+    first_name = db.Column(db.String(100))
+    last_name = db.Column(db.String(100))
+    hashed_password = db.Column(db.Integer)
+
+    def __init__(self, username, first_name, last_name, hashed_password):
+        """Instantiate an admin."""
+
+        self.username = username
+        self.first_name = first_name
+        self.last_name = last_name
+        self.hashed_password = hashed_password
+
+    def __repr__(self):
+        """Nice representation of Admin."""
+        return '<Admin username={}'.format(self.username)
+
+    def is_hashed_password(self, password):
+        """Return true if stored password matches hash of given password."""
+
+        return self.hashed_password == hash(password)
+
+
+class Config(db.Model):
+    """Store user-defined configuration and settings."""
+
+    __tablename__ = 'config'
+
+    code = db.Column(db.String(80), primary_key=True)
+    value = db.Column(db.String(100))
+
+    def __init__(self, code, value):
+        """Instantiate a config setting."""
+
+        self.code = code
+        self.value = value
+
+    def __repr__(self):
+        """Nice representation of Config."""
+
+        return '<Config code={code} value={value}'.format(code=self.code,
+                                                          value=self.value,
+                                                          )
 
 
 class Category(db.Model, JSONMixin):
@@ -67,7 +114,7 @@ class Category(db.Model, JSONMixin):
         self.desc = desc
 
     def __repr__(self):
-        """Nice represenation of Category."""
+        """Nice representation of Category."""
 
         return '<Category id={id} title={title}>'.format(id=self.id,
                                                          title=self.title,
@@ -321,6 +368,8 @@ def example_data():
                         Thumbnail('cool_thumb.jpg'),
                         ])
 
+    db.session.add_all([Config('title', 'My Portfolio')])
+
     db.session.commit()
 
 
@@ -331,6 +380,7 @@ def example_associations():
 
     categories = Category.query.all()
     projects = Project.query.all()
+    media = Media.query.all()
 
     db.session.add_all([CategoryProject(categories[0].id,
                                         projects[0].id),
@@ -338,6 +388,19 @@ def example_associations():
                                         projects[1].id),
                         CategoryProject(categories[2].id,
                                         projects[2].id),
+                        ])
+    db.session.commit()
+
+    db.session.add_all([ProjectMedia(projects[0].id,
+                                     media[0].id),
+                        ProjectMedia(projects[1].id,
+                                     media[1].id),
+                        ProjectMedia(projects[1].id,
+                                     media[2].id),
+                        ProjectMedia(projects[2].id,
+                                     media[2].id),
+                        ProjectMedia(projects[2].id,
+                                     media[3].id),
                         ])
     db.session.commit()
 
