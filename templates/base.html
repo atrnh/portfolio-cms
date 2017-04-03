@@ -8,21 +8,26 @@
   <script src="static/js/app.js"></script>
 </head>
 
-<body ng-app="portfolio" ng-controller="CategoryController">
+<body ng-app="portfolio" ng-controller="PortfolioController">
   <nav>
     {% if categories %}
       <ul>
         {% for category in categories %}
           <li>
             <a href="#/{{ category.title }}"
-               ng-click="updateView({{ category.id }})">
+               ng-click="viewCategory({{ category.id }})">
               {{ category.title }}
             </a>
           </li>
           {% if category.projects %}
             <ul>
               {% for project in category.projects %}
-                <li>{{ project.title }}</li>
+                <li>
+                  <a href="#/{{ project.title }}"
+                     ng-click="viewProject({{ project.id }})">
+                    {{ project.title }}
+                  </a>
+                </li>
               {% endfor %}
             </ul>
           {% endif %}

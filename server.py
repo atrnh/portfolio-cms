@@ -5,6 +5,7 @@ from flask import (Flask, render_template, Response, request, redirect)
 from flask_debugtoolbar import DebugToolbarExtension
 from model import (Category, Project, Tag, Media, Thumbnail, ProjectMedia,
                    CategoryProject, TagProject, db, connect_to_db,)
+import json
 
 app = Flask(__name__)
 
@@ -33,6 +34,7 @@ def index():
 
 @app.route('/categories.json')
 def get_categories_json():
+    """Return JSON list of all categories in database."""
 
     categories = Category.query.options(db.joinedload('projects')
                                         ).all()
@@ -42,16 +44,58 @@ def get_categories_json():
                     )
 
 
-@app.route('/category/<category_id>/projects.json')
-def get_category_projects_json(category_id):
+@app.route('/category.json')
+def get_category_json():
+    """Return JSON category."""
 
-    projects = Category.query.options(
+    category_id = request.args.get('categoryId')
+
+    category = Category.query.options(
         db.joinedload('projects')
-    ).filter_by(id=category_id).one().projects
+    ).get(category_id)
 
-    print projects
+    return Response(category.get_attributes(),
+                    mimetype='application/json'
+                    )
 
-    return Response(Project.get_json_from_list(projects),
+
+@app.route('/projects.json')
+def get_category_projects_json():
+    """Return JSON list of all projects.
+
+    If categoryId is given in the request, return list of only projects
+    associated with that category. If not, return list of all projects.
+    """
+
+    category_id = request.args.get('categoryId')
+
+    if category_id:
+        category_projects = Category.query.options(
+            db.joinedload('projects')
+        ).filter_by(id=category_id).one().projects
+
+        return Response(Project.get_json_from_list(category_projects),
+                        mimetype='application/json'
+                        )
+    else:
+        projects = Project.query.all()
+
+        return Response(Project.get_json_from_list(projects),
+                        mimetype='application/json'
+                        )
+
+
+@app.route('/project.json')
+def get_project_json():
+    """Return JSON project."""
+
+    project_id = request.args.get('projectId')
+
+    project = Project.query.options(
+        db.joinedload('media')
+    ).get(project_id)
+
+    return Response(project.get_attributes(),
                     mimetype='application/json'
                     )
 
@@ -69,7 +113,7 @@ def show_dashboard():
     return render_template('dashboard.html', categories=categories)
 
 
-@app.route('/new_category', methods=['POST'])
+@app.route('/admin/category', methods=['POST'])
 def add_category():
     """Add a new category to the database."""
 
@@ -83,7 +127,7 @@ def add_category():
     return redirect('/admin/dashboard')
 
 
-@app.route('/new_project', methods=['POST'])
+@app.route('/admin/project', methods=['POST'])
 def add_project():
     """Add a new project to the database."""
 

@@ -26,13 +26,13 @@
       </ul>
     {% endif %}
     <h2>New category</h2>
-    <form action="/new_category" method="POST">
+    <form action="/admin/category" method="POST">
       <input type="text" name="title" placeholder="Title"></br>
       <input type="text" name="desc" placeholder="Description"></br>
       <input type="submit">
     </form>
     <h2>New project</h2>
-    <form action="/new_project" method="POST">
+    <form action="/admin/project" method="POST">
       <input type="text" name="title" placeholder="Title"></br>
       <input type="text" name="desc" placeholder = "Description"></br>
       {% if categories %}
