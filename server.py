@@ -19,8 +19,8 @@ app.jinja_env.undefined = StrictUndefined
 
 
 @app.route('/')
-def index():
-    """Homepage.
+def view_portfolio():
+    """Portfolio homepage.
 
     Display all categories and their projects in the database.
     """
@@ -29,15 +29,24 @@ def index():
                                         ).order_by(Category.id
                                                    ).all()
 
-    return render_template('index.html', categories=categories)
+    return render_template('portfolio.html', categories=categories)
 
 
 @app.route('/categories.json')
 def get_categories_json():
     """Return JSON list of all categories in database."""
 
-    categories = Category.query.options(db.joinedload('projects')
-                                        ).all()
+    load_all = request.args.get('loadAll')
+
+    if load_all:
+        categories = Category.query.options(db.joinedload('projects')
+                                              .joinedload('media')
+                                            ).order_by(Category.id
+                                                       ).all()
+    else:
+        categories = Category.query.options(db.joinedload('projects')
+                                            ).order_by(Category.id
+                                                       ).all()
 
     return Response(Category.get_json_from_list(categories),
                     mimetype='application/json'
@@ -100,14 +109,15 @@ def get_project_json():
                     )
 
 
-@app.route('/admin/dashboard')
+@app.route('/admin/dashboard/')
 def show_dashboard():
     """Admin dashboard.
 
     Display all categories, projects, and forms to create new ones.
     """
 
-    categories = Category.query.options(db.joinedload('projects')
+    categories = Category.query.options(db.joinedload('projects').
+                                        joinedload('media')
                                         ).all()
 
     return render_template('dashboard.html', categories=categories)
@@ -117,14 +127,17 @@ def show_dashboard():
 def add_category():
     """Add a new category to the database."""
 
-    title = request.form.get('title')
-    desc = request.form.get('desc')
+    title = request.args.get('categoryTitle')
+    desc = request.args.get('categoryDesc')
     category = Category(title, desc)
+
+    print title
+    print desc
 
     db.session.add(category)
     db.session.commit()
 
-    return redirect('/admin/dashboard')
+    return redirect('/categories.json')
 
 
 @app.route('/admin/project', methods=['POST'])
@@ -147,7 +160,7 @@ def add_project():
 
 
 if __name__ == '__main__':
-    app.debug = False
+    app.debug = True
     app.jinja_env.auto_reload = app.debug
 
     connect_to_db(app)
