@@ -10,7 +10,12 @@
   <ul ng-show="categories" id="categories">
     <li ng-repeat="category in categories"
         class="category">
-      {[{ category.title }]}
+      <span>
+        {[{ category.title }]}
+        <button ng-click="deleteCategory(category.id)">
+          x
+        </button>
+      </span>
       <ul ng-show="category.projects">
         <li ng-repeat="project in category.projects">
           {[{ project.title }]}

@@ -81,8 +81,13 @@ angular.module("dashboard", ['ngRoute', 'ngResource'])
           'post': {
             method: 'POST'
           }
-
         }).post({}, {'title': title, 'desc': desc});
+      },
+
+      delete: function(id) {
+        return $resource('/admin/category', {}, {
+          // TODO: make this do stuff
+        }).post();
       }
     };
   })
@@ -91,6 +96,12 @@ angular.module("dashboard", ['ngRoute', 'ngResource'])
     Category.getAll('t').$promise.then(function (categories) {
       $scope.categories = categories;
     });
+
+    $scope.deleteCategory = function (id) {
+      Category.delete(id).$promise.then(function (categories) {
+        $location.path('/');
+      });
+    };
   })
 
   .controller('NewProjectController', function ($scope, Category) {
@@ -101,7 +112,7 @@ angular.module("dashboard", ['ngRoute', 'ngResource'])
 
   .controller('NewCategoryController', function ($scope, Category, $location) {
     $scope.addCategory = function (title, desc) {
-      Category.addNew(title, desc) .$promise.then(function (categories) {
+      Category.addNew(title, desc).$promise.then(function (categories) {
         $location.path('/');
       });
     };
