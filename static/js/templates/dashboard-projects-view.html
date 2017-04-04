@@ -1,0 +1,25 @@
+<section id="add-new-menu">
+  <span>
+    Add new:
+    <a href="#/new/project">Project</a> /
+    <a href="#/new/category">Category</a>
+  </span>
+</section>
+
+<section ng-show="categories" id="projects-list">
+  <ul ng-show="categories" id="categories">
+    <li ng-repeat="category in categories"
+        class="category">
+      {[{ category.title }]}
+      <ul ng-show="category.projects">
+        <li ng-repeat="project in category.projects">
+          {[{ project.title }]}
+          <ul ng-show="project.media">
+            <li ng-repeat="media in project.media">
+              {[{ media.title }]}
+            </li>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</section>
