@@ -127,12 +127,11 @@ def show_dashboard():
 def add_category():
     """Add a new category to the database."""
 
-    title = request.args.get('categoryTitle')
-    desc = request.args.get('categoryDesc')
-    category = Category(title, desc)
+    data = json.loads(request.data.decode())
 
-    print title
-    print desc
+    title = data.get('title')
+    desc = data.get('desc')
+    category = Category(title, desc)
 
     db.session.add(category)
     db.session.commit()

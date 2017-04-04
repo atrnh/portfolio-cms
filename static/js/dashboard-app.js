@@ -79,11 +79,10 @@ angular.module("dashboard", ['ngRoute', 'ngResource'])
       addNew: function(title, desc) {
         return $resource('/admin/category', {}, {
           'post': {
-            method: 'POST',
-            params: {categoryTitle: title, categoryDesc: desc}
+            method: 'POST'
           }
 
-        }).post();
+        }).post({}, {'title': title, 'desc': desc});
       }
     };
   })
