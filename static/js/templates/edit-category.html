@@ -1,0 +1,18 @@
+<section>
+  <h2>Edit Category</h2>
+  <h3>
+    {[{ category.title }]}
+  </h3>
+  <p>
+    <i>{[{ category.desc }]}</i>
+  </p>
+  <input ng-model="title"
+         type="text"
+         placeholder="New Title"
+         ></br>
+  <input ng-model="desc"
+         type="text"
+         placeholder="New Description"
+         ></br>
+  <button ng-click="updateCategory(title, desc)">Submit</button>
+</section>
