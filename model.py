@@ -180,6 +180,29 @@ class Tag(db.Model, JSONMixin):
 
         return '<Tag code={}>'.format(self.code)
 
+    @classmethod
+    def create_tags(cls, tags):
+        """Take a list of strings that are tag codes and creates tags.
+
+        Return a list of Tag objects.
+
+        It only creates and commits tags if they do not already exist in the
+        database.
+        """
+
+        # Get existing tags
+        existing_tags = cls.query.filter(cls.code.in_(tags)).all()
+        # Make new Tag objects if they do not exist
+        new_tags = [
+            cls(tag) for tag in tags
+            if tag not in set([e_tag.code for e_tag in existing_tags])
+        ]
+
+        db.session.add_all(new_tags)
+        db.session.commit()
+
+        return existing_tags + new_tags
+
 
 class Media(db.Model, JSONMixin):
     """An image or embedded video."""
@@ -329,11 +352,14 @@ def example_data():
     """Create example data for testing."""
 
     db.session.add_all([Category('Test',
-                                 'This is a test category.'),
+                                 'This is a test category.'
+                                 ),
                         Category('Sculptures',
-                                 'Another test category of wonderful sculptures.'),
+                                 'Another test category of wonderful sculptures.'
+                                 ),
                         Category('Photos',
-                                 'Test another category of cool photos.'),
+                                 'Test another category of cool photos.'
+                                 ),
                         ])
 
     db.session.add_all([Media('Test Image',
@@ -376,7 +402,8 @@ def example_data():
 def example_associations():
     """Create example associations for testing.
 
-    ONLY call this after example_data or it will not work."""
+    ONLY call this after example_data or it will not work.
+    """
 
     categories = Category.query.all()
     projects = Project.query.all()

@@ -51,9 +51,7 @@ def get_categories_json():
                                             ).order_by(Category.id
                                                        ).all()
 
-    return Response(Category.get_json_from_list(categories),
-                    mimetype='application/json'
-                    )
+    return jsonify_list(Category.get_json_from_list(categories))
 
 
 @app.route('/category.json')
@@ -66,9 +64,7 @@ def get_category_json():
         db.joinedload('projects')
     ).get(category_id)
 
-    return Response(category.get_attributes(),
-                    mimetype='application/json'
-                    )
+    return jsonify_list(category.get_attributes())
 
 
 @app.route('/projects.json')
@@ -92,9 +88,7 @@ def get_category_projects_json():
     else:
         projects = Project.query.all()
 
-        return Response(Project.get_json_from_list(projects),
-                        mimetype='application/json'
-                        )
+        return jsonify_list(Project.get_json_from_list(projects))
 
 
 @app.route('/project.json')
@@ -107,9 +101,7 @@ def get_project_json():
         db.joinedload('media')
     ).get(project_id)
 
-    return Response(project.get_attributes(),
-                    mimetype='application/json'
-                    )
+    return jsonify_list(project.get_attributes())
 
 
 @app.route('/admin/dashboard/')
@@ -155,9 +147,7 @@ def delete_category(category_id):
                                             ).order_by(Category.id
                                                        ).all()
 
-        return Response(Category.get_json_from_list(categories),
-                        mimetype='application/json'
-                        )
+        return jsonify_list(Category.get_json_from_list(categories))
 
 
 @app.route('/admin/project', methods=['POST'])
@@ -181,24 +171,20 @@ def add_project():
     db.session.add(CategoryProject(category_id, project.id))
     db.session.commit()
 
-    # Get existing tags
-    existing_tags = Tag.query.filter(Tag.code.in_(tags)).all()
-    # Make new Tag objects if they do not exist
-    new_tags = [Tag(tag) for tag in tags
-                if tag not in [e_tag.code for e_tag in existing_tags]
-                ]
+    all_tags = Tag.create_tags(tags)
 
-    db.session.add_all(new_tags)
-    db.session.commit()
-
-    # Add new associations
-    all_tags = existing_tags + new_tags
     db.session.add_all([TagProject(project.id, tag.code)
                         for tag in all_tags
                         ])
     db.session.commit()
 
     return redirect('/admin/dashboard')
+
+
+def jsonify_list(objects):
+    """Return a Response object with a top-level array of objects."""
+
+    Response(objects, mimetype='application/json')
 
 
 if __name__ == '__main__':
