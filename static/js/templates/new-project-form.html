@@ -1,11 +1,10 @@
 <section>
   <h2>New project</h2>
-  <form action="/admin/project" method="POST">
-    <input type="text" name="title" placeholder="Title"></br>
-    <input type="text" name="desc" placeholder = "Description"></br>
-      <select ng-show="categories" name="category_id">
-          <option ng-repeat="category in categories" value="{[{ category.id }]}">{[{ category.title }]}</option>
-      </select></br>
-    <input type="submit">
-  </form>
+  <input ng-model="title" type="text" placeholder="Title"></br>
+  <input ng-model="desc" type="text" placeholder="Description"></br>
+    <select ng-show="categories" ng-model="categoryId">
+        <option ng-repeat="category in categories" value="{[{ category.id }]}">{[{ category.title }]}</option>
+    </select></br>
+  <input ng-model="rawTags" type="text" placeholder="comma-separated tags"></br>
+  <button ng-click="addProject(title, desc, categoryId, rawTags)">Submit</button>
 </section>
