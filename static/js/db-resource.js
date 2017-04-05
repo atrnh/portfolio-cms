@@ -52,9 +52,7 @@ var app = angular.module('dbResource', ['ngResource'])
         });
       },
 
-      // update: function(title, desc, categoryId) {
-      //
-      // }
+
 
     };
   })
@@ -98,6 +96,15 @@ var app = angular.module('dbResource', ['ngResource'])
             isArray: true
           }
         }).delete();
+      },
+
+      update: function(id, title, desc) {
+        return $resource('/admin/category/:categoryId', {categoryId: id}, {
+          'post': {
+            method: 'POST',
+            isArray: true
+          }
+        }).post({}, {'title': title, 'desc': desc});
       }
     };
   })

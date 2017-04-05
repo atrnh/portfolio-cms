@@ -9,13 +9,25 @@ angular.module('dashboard', ['ngRoute', 'dbResource'])
         templateUrl: '/static/js/templates/dashboard-projects-view.html',
         controller: 'ProjectsController'
       })
+
       .when('/new/project', {
-        templateUrl: '/static/js/templates/new-project-form.html',
+        templateUrl: '/static/js/templates/new-project.html',
         controller: 'NewProjectController'
       })
+
       .when('/new/category', {
-        templateUrl: '/static/js/templates/new-category-form.html',
+        templateUrl: '/static/js/templates/new-category.html',
         controller: 'NewCategoryController'
+      })
+
+      .when('/edit/category/:categoryId', {
+          templateUrl: '/static/js/templates/edit-category.html',
+          controller: 'EditCategoryController'
+      })
+
+      .when('/edit/project/:projectId', {
+        templateUrl: '/static/js/templates/edit-project.html',
+        controller: 'EditProjectController'
       })
       ;
   })
@@ -64,5 +76,23 @@ angular.module('dashboard', ['ngRoute', 'dbResource'])
         $location.path('/');
       });
     };
+  })
+
+  .controller('EditCategoryController', function ($scope, $location, $routeParams, Category) {
+    $scope.id = $routeParams.categoryId;
+
+    $scope.category = Category.getById($scope.id);
+
+    $scope.updateCategory = function (title, desc, id=$scope.id) {
+      Category.update(id, title, desc).$promise.then(function (categories) {
+        $location.path('/');
+      });
+    };
+  })
+
+  .controller('EditCategoryController', function ($scope, $location, $routeParams, Project) {
+    $scope.id = $routeParams.projectId;
+
+    $scope.project = Project.getById($scope.id);
   })
 ;

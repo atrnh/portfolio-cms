@@ -11,7 +11,9 @@
     <li ng-repeat="category in categories"
         class="category">
       <span>
-        {[{ category.title }]}
+        <a href="#/edit/category/{[{ category.id }]}">
+          {[{ category.title }]}
+        </a>
         <button ng-click="deleteCategory(category.id)">
           x
         </button>
