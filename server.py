@@ -34,7 +34,10 @@ def view_portfolio():
 
 @app.route('/categories.json')
 def get_categories_json():
-    """Return JSON list of all categories in database."""
+    """Return JSON list of all categories in database.
+
+    If loadAll is present, greedily load all nested objects.
+    """
 
     load_all = request.args.get('loadAll')
 
@@ -139,13 +142,36 @@ def add_category():
     return redirect('/categories.json')
 
 
+@app.route('/admin/category/<category_id>', methods=['DELETE', 'POST'])
+def delete_category(category_id):
+    """Delete or update a category from the database."""
+
+    if request.method == 'DELETE':
+        db.session.delete(Category.query.get(category_id))
+        db.session.commit()
+
+        categories = Category.query.options(db.joinedload('projects')
+                                              .joinedload('media')
+                                            ).order_by(Category.id
+                                                       ).all()
+
+        return Response(Category.get_json_from_list(categories),
+                        mimetype='application/json'
+                        )
+
+
 @app.route('/admin/project', methods=['POST'])
 def add_project():
     """Add a new project to the database."""
 
-    title = request.form.get('title')
-    desc = request.form.get('desc')
-    category_id = request.form.get('category_id')
+    data = json.loads(request.data.decode())
+
+    title = data.get('title')
+    desc = data.get('desc')
+    category_id = data.get('categoryId')
+    tags = data.get('tags')
+
+    print data
 
     project = Project(title, desc=desc)
 
@@ -153,6 +179,23 @@ def add_project():
     db.session.commit()
 
     db.session.add(CategoryProject(category_id, project.id))
+    db.session.commit()
+
+    # Get existing tags
+    existing_tags = Tag.query.filter(Tag.code.in_(tags)).all()
+    # Make new Tag objects if they do not exist
+    new_tags = [Tag(tag) for tag in tags
+                if tag not in [e_tag.code for e_tag in existing_tags]
+                ]
+
+    db.session.add_all(new_tags)
+    db.session.commit()
+
+    # Add new associations
+    all_tags = existing_tags + new_tags
+    db.session.add_all([TagProject(project.id, tag.code)
+                        for tag in all_tags
+                        ])
     db.session.commit()
 
     return redirect('/admin/dashboard')

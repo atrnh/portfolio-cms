@@ -1,7 +1,7 @@
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 from sqlalchemy.sql import func
-from sqlalchemy.inspection import inspect
+# from sqlalchemy.inspection import inspect
 import json
 
 db = SQLAlchemy()
