@@ -149,6 +149,29 @@ def delete_category(category_id):
 
         return jsonify_list(Category.get_json_from_list(categories))
 
+    elif request.method == 'POST':
+        data = json.loads(request.data.decode())
+
+        title = data.get('title')
+        desc = data.get('desc')
+
+        category = Category.query.get(category_id)
+
+        if title:
+            category.title = title
+
+        if desc:
+            category.desc = desc
+
+        db.session.commit()
+
+        categories = Category.query.options(db.joinedload('projects')
+                                              .joinedload('media')
+                                            ).order_by(Category.id
+                                                       ).all()
+
+        return jsonify_list(Category.get_json_from_list(categories))
+
 
 @app.route('/admin/project', methods=['POST'])
 def add_project():
@@ -184,7 +207,7 @@ def add_project():
 def jsonify_list(objects):
     """Return a Response object with a top-level array of objects."""
 
-    Response(objects, mimetype='application/json')
+    return Response(objects, mimetype='application/json')
 
 
 if __name__ == '__main__':
