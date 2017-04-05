@@ -1,8 +1,8 @@
-angular.module("dashboard", ['ngRoute', 'ngResource'])
+angular.module('dashboard', ['ngRoute', 'dbResource'])
   .config(function ($interpolateProvider, $routeProvider) {
-    $interpolateProvider
-      .startSymbol('{[{')
-      .endSymbol('}]}');
+    // $interpolateProvider
+    //   .startSymbol('{[{')
+    //   .endSymbol('}]}');
 
     $routeProvider
       .when('/', {
@@ -20,94 +20,42 @@ angular.module("dashboard", ['ngRoute', 'ngResource'])
       ;
   })
 
-  // Project service for getting project data from server
-  .factory('Project', function ($resource) {
-    return {
-
-      // Returns array of projects associated with given category id
-      getAllInCategory: function(id) {
-        return $resource('/projects.json', {categoryId: id}, {
-          'get': {
-            method: 'GET',
-            isArray: true
-          }
-        }).get();
-      },
-
-      getAll: function() {
-        return $resource('/projects.json', {}, {
-          'get': {
-            method: 'GET',
-            isArray: true
-          }
-        }).get();
-      },
-
-      getById: function(id) {
-        return $resource('/project.json', {projectId: id}, {
-          'get': {
-            method: 'GET'
-          }
-        }).get();
-      }
-
-    };
-  })
-
-  .factory('Category', function ($resource) {
-    return {
-      getById: function(id) {
-        return $resource('/category.json', {categoryId: id}, {
-          'query': {
-            method: 'GET'
-          },
-          'get': {
-            method: 'GET'
-          }
-        }).get();
-      },
-
-      getAll: function(loadAll) {
-        return $resource('/categories.json', {loadAll: loadAll}, {
-          'get': {
-            method: 'GET',
-            isArray: true
-          }
-        }).get();
-      },
-
-      addNew: function(title, desc) {
-        return $resource('/admin/category', {}, {
-          'post': {
-            method: 'POST'
-          }
-        }).post({}, {'title': title, 'desc': desc});
-      },
-
-      delete: function(id) {
-        return $resource('/admin/category', {}, {
-          // TODO: make this do stuff
-        }).post();
-      }
-    };
-  })
-
-  .controller('ProjectsController', function ($scope, Category) {
-    Category.getAll('t').$promise.then(function (categories) {
+  .controller('ProjectsController', function ($scope, $location, Category) {
+    Category.getAll('true').$promise.then(function (categories) {
       $scope.categories = categories;
     });
 
     $scope.deleteCategory = function (id) {
       Category.delete(id).$promise.then(function (categories) {
-        $location.path('/');
+        $scope.categories = categories;
       });
     };
   })
 
-  .controller('NewProjectController', function ($scope, Category) {
+  .controller('NewProjectController', function ($scope, $location, Category, Project) {
     Category.getAll().$promise.then(function (categories) {
       $scope.categories = categories;
     });
+
+    $scope.addProject = function(title, desc, categoryId, rawTags) {
+      var re = /\s*,\s*/;
+      var tags = rawTags.split(re);
+
+      // try {
+      //   tags = rawTags.split(re);
+      // } catch (e) {
+      //   if (e instanceof TypeError) {
+      //     tags = [];
+      //   }
+      // }
+
+      Project.addNew(title, desc, categoryId, tags)
+        .$promise
+        .then(function () {
+          $location.path('/');
+        })
+      ;
+    };
   })
 
   .controller('NewCategoryController', function ($scope, Category, $location) {

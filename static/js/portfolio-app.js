@@ -1,70 +1,10 @@
-var app = angular.module('portfolio', ['ngResource'])
+var app = angular.module('portfolio', ['dbResource'])
 
-  .config(function ($interpolateProvider) {
-    $interpolateProvider
-      .startSymbol('{[{')
-      .endSymbol('}]}');
-  })
-
-  // Project service for getting project data from server
-  .factory('Project', function ($resource) {
-    return {
-
-      // Returns array of projects associated with given category id
-      getAllInCategory: function(id) {
-        return $resource('/projects.json', {categoryId: id}, {
-          'query': {
-            method: 'GET',
-            isArray: true
-          },
-          'get': {
-            method: 'GET',
-            isArray: true
-          }
-        }).get();
-      },
-
-      getAll: function() {
-        return $resource('/projects.json', {}, {
-          'query': {
-            method: 'GET',
-            isArray: true
-          },
-          'get': {
-            method: 'GET',
-            isArray: true
-          }
-        }).get();
-      },
-
-      getById: function(id) {
-        return $resource('/project.json', {projectId: id}, {
-          'query': {
-            method: 'GET'
-          },
-          'get': {
-            method: 'GET'
-          }
-        }).get();
-      }
-
-    };
-  })
-
-  .factory('Category', function ($resource) {
-    return {
-      getById: function(id) {
-        return $resource('/category.json', {categoryId: id}, {
-          'query': {
-            method: 'GET'
-          },
-          'get': {
-            method: 'GET'
-          }
-        }).get();
-      }
-    };
-  })
+  // .config(function ($interpolateProvider) {
+  //   $interpolateProvider
+  //     .startSymbol('{[{')
+  //     .endSymbol('}]}');
+  // })
 
   .controller('PortfolioController', function ($scope, Project, Category) {
     $scope.viewCategory = function(categoryId) {
