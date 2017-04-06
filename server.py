@@ -246,6 +246,9 @@ def update_project(project_id):
             # Make new CategoryProject
             db.session.add(CategoryProject(category_id, project_id))
             db.session.commit()
+        if tags:
+            # filter out tags already in project_id
+            filtered_tags =
 
         db.session.commit()
 
