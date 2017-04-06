@@ -5,19 +5,18 @@
   </h3>
   <p>
     <i>
-      {[{ project.desc }]}
-      <b>Category:</b> {[{ project.categories }]}
+      {[{ project.desc }]}</br>
+      <b>Category:</b> {[{ project.categories[0].title }]}</br>
       <b>Tags:</b> {[{ tags }]}
-
     </i>
   </p>
-  <input ng-model="title"
-         type="text"
-         placeholder="New Title"
-         ></br>
-  <input ng-model="desc"
-         type="text"
-         placeholder="New Description"
-         ></br>
-  <button ng-click="updateCategory(title, desc)">Submit</button>
+  <input ng-model="title" type="text" placeholder="New Title"/></br>
+  <input ng-model="desc" type="text" placeholder="New Description"/></br>
+  <select ng-show="categories" ng-model="categoryId">
+    <option ng-repeat="category in categories" ng-value="category.id">
+      {[{ category.title }]}
+    </option>
+  </select></br>
+  <input ng-model="rawTags" type="text" placeholder="New tags" /></br>
+  <button ng-click="updateProject(title, desc, categoryId, rawTags)">Submit</button>
 </section>

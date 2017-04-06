@@ -14,17 +14,20 @@
         <a href="#/edit/category/{[{ category.id }]}">
           {[{ category.title }]}
         </a>
-        <button ng-click="deleteCategory(category.id)">
+        <button ng-if="category.projects.length === 0" ng-click="deleteCategory(category.id)">
           x
         </button>
       </span>
       <ul ng-show="category.projects">
         <li ng-repeat="project in category.projects">
-          {[{ project.title }]}
-          <ul ng-show="project.media">
-            <li ng-repeat="media in project.media">
-              {[{ media.title }]}
-            </li>
+          <span>
+            <a href="#/edit/project/{[{ project.id }]}">
+              {[{ project.title }]}
+            </a>
+            <button ng-click="deleteProject(project.id)">
+              x
+            </button>
+          </span>
         </li>
       </ul>
     </li>

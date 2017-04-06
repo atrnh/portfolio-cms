@@ -32,13 +32,19 @@ angular.module('dashboard', ['ngRoute', 'dbResource'])
       ;
   })
 
-  .controller('ProjectsController', function ($scope, $location, Category) {
+  .controller('ProjectsController', function ($scope, $location, Category, Project) {
     Category.getAll('true').$promise.then(function (categories) {
       $scope.categories = categories;
     });
 
     $scope.deleteCategory = function (id) {
       Category.delete(id).$promise.then(function (categories) {
+        $scope.categories = categories;
+      });
+    };
+
+    $scope.deleteProject = function (id) {
+      Project.delete(id).$promise.then(function (categories) {
         $scope.categories = categories;
       });
     };
@@ -70,6 +76,38 @@ angular.module('dashboard', ['ngRoute', 'dbResource'])
     };
   })
 
+  .controller('EditProjectController', function ($scope, $location, $routeParams, Project, Category) {
+    $scope.id = $routeParams.projectId;
+    $scope.project = Project.getById($scope.id);
+    var tags = [];
+
+    console.log($scope.project.tags);
+
+    if ($scope.project.tags) {
+      for (let tag in $scope.project.tags) {
+        tags.push(tag.code);
+      }
+    }
+
+    $scope.tags = tags.join(', ');
+
+    Category.getAll().$promise.then(function (categories) {
+      $scope.categories = categories;
+    });
+
+    $scope.updateProject = function(title, desc, categoryId, rawTags, id=$scope.id) {
+      var tags;
+      if (rawTags) {
+        tags = rawTags.split(/\s*,\s*/);
+      }
+
+      Project.update(id, title, desc, categoryId, tags)
+        .$promise.then(function (categories) {
+          $location.path('/');
+        });
+    };
+  })
+
   .controller('NewCategoryController', function ($scope, Category, $location) {
     $scope.addCategory = function (title, desc) {
       Category.addNew(title, desc).$promise.then(function (categories) {
@@ -80,7 +118,6 @@ angular.module('dashboard', ['ngRoute', 'dbResource'])
 
   .controller('EditCategoryController', function ($scope, $location, $routeParams, Category) {
     $scope.id = $routeParams.categoryId;
-
     $scope.category = Category.getById($scope.id);
 
     $scope.updateCategory = function (title, desc, id=$scope.id) {
@@ -88,11 +125,5 @@ angular.module('dashboard', ['ngRoute', 'dbResource'])
         $location.path('/');
       });
     };
-  })
-
-  .controller('EditCategoryController', function ($scope, $location, $routeParams, Project) {
-    $scope.id = $routeParams.projectId;
-
-    $scope.project = Project.getById($scope.id);
   })
 ;

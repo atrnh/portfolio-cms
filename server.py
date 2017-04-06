@@ -98,7 +98,9 @@ def get_project_json():
     project_id = request.args.get('projectId')
 
     project = Project.query.options(
-        db.joinedload('media')
+        db.joinedload('categories'),
+        db.joinedload('media'),
+        db.joinedload('tags')
     ).get(project_id)
 
     return jsonify_list(project.get_attributes())
@@ -135,7 +137,7 @@ def add_category():
 
 
 @app.route('/admin/category/<category_id>', methods=['DELETE', 'POST'])
-def delete_category(category_id):
+def update_category(category_id):
     """Delete or update a category from the database."""
 
     if request.method == 'DELETE':
@@ -184,24 +186,75 @@ def add_project():
     category_id = data.get('categoryId')
     tags = data.get('tags')
 
-    print data
-
+    # Add project
     project = Project(title, desc=desc)
-
     db.session.add(project)
     db.session.commit()
 
+    # Add association
     db.session.add(CategoryProject(category_id, project.id))
     db.session.commit()
 
+    # Add tags
     all_tags = Tag.create_tags(tags)
-
     db.session.add_all([TagProject(project.id, tag.code)
                         for tag in all_tags
                         ])
     db.session.commit()
 
     return redirect('/admin/dashboard')
+
+
+@app.route('/admin/project/<project_id>', methods=['DELETE', 'POST'])
+def update_project(project_id):
+    """Delete or update a project from the database."""
+
+    if request.method == 'DELETE':
+        db.session.delete(Project.query.get(project_id))
+        db.session.commit()
+
+        categories = Category.query.options(db.joinedload('projects')
+                                              .joinedload('media')
+                                            ).order_by(Category.id
+                                                       ).all()
+
+        return jsonify_list(Category.get_json_from_list(categories))
+
+    elif request.method == 'POST':
+        data = json.loads(request.data.decode())
+
+        title = data.get('title')
+        desc = data.get('desc')
+        category_id = data.get('categoryId')
+        tags = data.get('tags')
+
+        project = Project.query.get(project_id)
+        original_cat = project.categories[0]
+
+        if title:
+            project.title = title
+        if desc:
+            project.desc = desc
+        if category_id:
+            # Delete old CategoryProject
+            db.session.delete(
+                CategoryProject.query.filter_by(category_id=original_cat.id,
+                                                project_id=project_id).one()
+            )
+            db.session.commit()
+
+            # Make new CategoryProject
+            db.session.add(CategoryProject(category_id, project_id))
+            db.session.commit()
+
+        db.session.commit()
+
+        categories = Category.query.options(db.joinedload('projects')
+                                              .joinedload('media')
+                                            ).order_by(Category.id
+                                                       ).all()
+
+        return jsonify_list(Category.get_json_from_list(categories))
 
 
 def jsonify_list(objects):

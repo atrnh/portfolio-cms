@@ -52,7 +52,28 @@ var app = angular.module('dbResource', ['ngResource'])
         });
       },
 
+      delete: function(id) {
+        return $resource('/admin/project/:projectId', {projectId: id}, {
+          'delete': {
+            method: 'DELETE',
+            isArray: true
+          }
+        }).delete();
+      },
 
+      update: function(id, title, desc, categoryId, tags) {
+        return $resource('/admin/project/:projectId', {projectId: id}, {
+          'post': {
+            method: 'POST',
+            isArray: true
+          }
+        }).post({}, {
+          'title': title,
+          'desc': desc,
+          'categoryId': categoryId,
+          'tags': tags
+        });
+      }
 
     };
   })
