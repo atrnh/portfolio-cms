@@ -64,8 +64,7 @@ var app = angular.module('dbResource', ['ngResource'])
       update: function(id, title, desc, categoryId, tags) {
         return $resource('/admin/project/:projectId', {projectId: id}, {
           'post': {
-            method: 'POST',
-            isArray: true
+            method: 'POST'
           }
         }).post({}, {
           'title': title,
@@ -73,6 +72,17 @@ var app = angular.module('dbResource', ['ngResource'])
           'categoryId': categoryId,
           'tags': tags
         });
+      },
+
+      deleteTag: function(id, tagCode) {
+        return $resource(
+          '/admin/project/:projectId/tag/:tagCode',
+          {projectId: id, tagCode: tagCode}, {
+            'delete': {
+              method: 'DELETE'
+            }
+          }
+        ).delete();
       }
 
     };

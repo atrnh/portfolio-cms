@@ -59,14 +59,6 @@ angular.module('dashboard', ['ngRoute', 'dbResource'])
       var re = /\s*,\s*/;
       var tags = rawTags.split(re);
 
-      // try {
-      //   tags = rawTags.split(re);
-      // } catch (e) {
-      //   if (e instanceof TypeError) {
-      //     tags = [];
-      //   }
-      // }
-
       Project.addNew(title, desc, categoryId, tags)
         .$promise
         .then(function () {
@@ -77,34 +69,52 @@ angular.module('dashboard', ['ngRoute', 'dbResource'])
   })
 
   .controller('EditProjectController', function ($scope, $location, $routeParams, Project, Category) {
+    $scope.editTitle = false;
+
     $scope.id = $routeParams.projectId;
-    $scope.project = Project.getById($scope.id);
-    var tags = [];
-
-    console.log($scope.project.tags);
-
-    if ($scope.project.tags) {
-      for (let tag in $scope.project.tags) {
-        tags.push(tag.code);
-      }
-    }
-
-    $scope.tags = tags.join(', ');
+    Project.getById($scope.id).$promise.then(function (project) {
+      $scope.project = project;
+      $scope.currCategory = project.categories[0].id;
+    });
 
     Category.getAll().$promise.then(function (categories) {
       $scope.categories = categories;
+      $scope.currCategoryIdx = categories.findIndex(function (category) {
+        return category.id === $scope.currCategory;
+      });
+      $scope.thisCategory = $scope.categories[$scope.currCategoryIdx];
     });
 
-    $scope.updateProject = function(title, desc, categoryId, rawTags, id=$scope.id) {
+    $scope.updateProject = function(title, desc, category, rawTags, id=$scope.id) {
       var tags;
       if (rawTags) {
         tags = rawTags.split(/\s*,\s*/);
       }
 
-      Project.update(id, title, desc, categoryId, tags)
-        .$promise.then(function (categories) {
-          $location.path('/');
+      console.log(category);
+
+      Project.update(id, title, desc, category, tags)
+        .$promise.then(function (project) {
+          $scope.project = project;
         });
+      $scope.editTitle = false;
+    };
+
+    $scope.deleteTag = function(tagCode, id=$scope.id) {
+      Project.deleteTag(id, tagCode).$promise.then(function (project) {
+        $scope.project = project;
+      });
+    };
+
+    $scope.startEdit = function(editTitle) {
+      console.log(editTitle);
+      if (editTitle) {
+        $scope.editTitle = false;
+      } else {
+        $scope.editTitle = true;
+      }
+
+      console.log($scope.editTitle);
     };
   })
 

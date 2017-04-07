@@ -1,22 +1,26 @@
 <section>
   <h2>Edit Project</h2>
   <h3>
-    {[{ project.title }]}
+    <span ng-show="!editTitle">
+      {[{ project.title }]}
+      <a ng-click="startEdit(editTitle)">edit</a>
+    </span>
+    <input ng-show="editTitle" ng-model="project.title" type="text" placeholder="New Title"/>
   </h3>
   <p>
     <i>
       {[{ project.desc }]}</br>
-      <b>Category:</b> {[{ project.categories[0].title }]}</br>
-      <b>Tags:</b> {[{ tags }]}
+      <b>Category:</b> {[{ thisCategory.title }]}</br>
+      <b>Tags:</b>
+      <button ng-repeat="tag in project.tags" ng-click="deleteTag(tag.code)">{[{ tag.code }]} x</button>
     </i>
   </p>
-  <input ng-model="title" type="text" placeholder="New Title"/></br>
-  <input ng-model="desc" type="text" placeholder="New Description"/></br>
-  <select ng-show="categories" ng-model="categoryId">
-    <option ng-repeat="category in categories" ng-value="category.id">
-      {[{ category.title }]}
-    </option>
-  </select></br>
+  <!-- <input ng-model="project.title" type="text" placeholder="New Title"/></br> -->
+  <input ng-model="project.desc" type="text" placeholder="New Description"/></br>
+  <select ng-show="categories"
+          ng-model="thisCategory"
+          ng-options="category as category.title for category in categories">
+    </select></br>
   <input ng-model="rawTags" type="text" placeholder="New tags" /></br>
-  <button ng-click="updateProject(title, desc, categoryId, rawTags)">Submit</button>
+  <button ng-click="updateProject(project.title, project.desc, thisCategory.id, rawTags)">Submit</button>
 </section>
