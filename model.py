@@ -1,6 +1,7 @@
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 from sqlalchemy.sql import func
+from sqlalchemy.orm import exc
 # from sqlalchemy.inspection import inspect
 import json
 
@@ -159,6 +160,49 @@ class Project(db.Model, JSONMixin):
         return '<Project id={id} title={title}>'.format(id=self.id,
                                                         title=self.title,
                                                         )
+
+    def update(self, title=None, desc=None, category_id=None, tags=None):
+        """Update a project's fields."""
+
+        if title:
+            self.title = title
+        if desc:
+            self.desc = desc
+        if category_id:
+            # Delete old CategoryProject
+            try:
+                db.session.delete(
+                    CategoryProject.query.filter_by(
+                        category_id=self.categories[0].id,
+                        project_id=self.id).one()
+                )
+                db.session.commit()
+
+                # Make new CategoryProject
+                db.session.add(CategoryProject(category_id, self.id))
+                db.session.commit()
+
+            except exc.NoResultFound:
+                # Make new CategoryProject
+                db.session.add(CategoryProject(category_id, self.id))
+                db.session.commit()
+
+        if tags:
+            # Filter out tags already in project_id
+            filtered_tags = [tag for tag in tags
+                             if tag not in
+                             set([p_tag.code for p_tag in self.tags])
+                             ]
+            # Make new tags
+            tag_objects = Tag.create_tags(filtered_tags)
+            db.session.add_all(tag_objects)
+            db.session.commit()
+
+            # make new associations
+            db.session.add_all([TagProject(self.id, tag.code)
+                                for tag in tag_objects
+                                ])
+            db.session.commit()
 
 
 class Tag(db.Model, JSONMixin):

@@ -92,10 +92,11 @@ def get_category_projects_json():
 
 
 @app.route('/project.json')
-def get_project_json():
+def get_project_json(project_id=None):
     """Return JSON project."""
 
-    project_id = request.args.get('projectId')
+    if not project_id:
+        project_id = request.args.get('projectId')
 
     project = Project.query.options(
         db.joinedload('categories'),
@@ -209,8 +210,10 @@ def add_project():
 def update_project(project_id):
     """Delete or update a project from the database."""
 
+    project = Project.query.get(project_id)
+
     if request.method == 'DELETE':
-        db.session.delete(Project.query.get(project_id))
+        db.session.delete(project)
         db.session.commit()
 
         categories = Category.query.options(db.joinedload('projects')
@@ -228,36 +231,31 @@ def update_project(project_id):
         category_id = data.get('categoryId')
         tags = data.get('tags')
 
-        project = Project.query.get(project_id)
-        original_cat = project.categories[0]
-
-        if title:
-            project.title = title
-        if desc:
-            project.desc = desc
-        if category_id:
-            # Delete old CategoryProject
-            db.session.delete(
-                CategoryProject.query.filter_by(category_id=original_cat.id,
-                                                project_id=project_id).one()
-            )
-            db.session.commit()
-
-            # Make new CategoryProject
-            db.session.add(CategoryProject(category_id, project_id))
-            db.session.commit()
-        if tags:
-            # filter out tags already in project_id
-            filtered_tags =
+        project.update(title, desc, category_id, tags)
 
         db.session.commit()
 
-        categories = Category.query.options(db.joinedload('projects')
-                                              .joinedload('media')
-                                            ).order_by(Category.id
-                                                       ).all()
+        return get_project_json(project_id)
 
-        return jsonify_list(Category.get_json_from_list(categories))
+
+@app.route('/admin/project/<project_id>/tag/<tag_code>',
+           methods=['DELETE']
+           )
+def delete_project_tag(project_id, tag_code):
+    """Delete a tag from a project."""
+
+    db.session.delete(TagProject.query.filter_by(project_id=project_id,
+                                                 tag_code=tag_code
+                                                 ).one())
+    db.session.commit()
+
+    # Delete tag if it has no associated projects
+    tag = Tag.query.get(tag_code)
+    if not tag.projects:
+        db.session.delete(tag)
+        db.session.commit()
+
+    return get_project_json(project_id)
 
 
 def jsonify_list(objects):
