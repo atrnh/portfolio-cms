@@ -1,8 +1,8 @@
+(function(angular) {
+  'use strict';
+
 angular.module('dashboard', ['ngRoute', 'dbResource'])
   .config(function ($interpolateProvider, $routeProvider) {
-    // $interpolateProvider
-    //   .startSymbol('{[{')
-    //   .endSymbol('}]}');
 
     $routeProvider
       .when('/', {
@@ -137,3 +137,4 @@ angular.module('dashboard', ['ngRoute', 'dbResource'])
     };
   })
 ;
+})(window.angular);

@@ -1,10 +1,6 @@
-var app = angular.module('portfolio', ['dbResource'])
-
-  // .config(function ($interpolateProvider) {
-  //   $interpolateProvider
-  //     .startSymbol('{[{')
-  //     .endSymbol('}]}');
-  // })
+(function(angular) {
+  'use strict';
+angular.module('portfolio', ['dbResource'])
 
   .controller('PortfolioController', function ($scope, Project, Category) {
     $scope.viewCategory = function(categoryId) {
@@ -26,3 +22,4 @@ var app = angular.module('portfolio', ['dbResource'])
 
   })
 ;
+})(window.angular);

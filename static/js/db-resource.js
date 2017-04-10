@@ -1,4 +1,6 @@
-var app = angular.module('dbResource', ['ngResource'])
+(function(angular) {
+  'use strict';
+angular.module('dbResource', ['ngResource'])
 
   .config(function ($interpolateProvider) {
     $interpolateProvider
@@ -140,3 +142,4 @@ var app = angular.module('dbResource', ['ngResource'])
     };
   })
 ;
+})(window.angular);
