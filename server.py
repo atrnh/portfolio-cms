@@ -3,9 +3,15 @@
 from jinja2 import StrictUndefined
 from flask import (Flask, render_template, Response, request, redirect)
 from flask_debugtoolbar import DebugToolbarExtension
+from flask_uploads import UploadSet, IMAGES, configure_uploads
+
 from model import (Category, Project, Tag, Media, Thumbnail, ProjectMedia,
                    CategoryProject, TagProject, db, connect_to_db,)
 import json
+
+from flask.ext.api.decorators import set_parsers
+from flask.ext.api.parsers import MultiPartParser
+
 
 app = Flask(__name__)
 
@@ -16,6 +22,8 @@ app.secret_key = 'ABC'
 # silently. This is horrible. Fix this so that, instead, it raises an
 # error.
 app.jinja_env.undefined = StrictUndefined
+
+app.config['UPLOADS_DEFAULT_DEST'] = 'static'
 
 
 @app.route('/')
@@ -242,6 +250,28 @@ def delete_project_tag(project_id, tag_code):
     if not tag.projects:
         db.session.delete(tag)
         db.session.commit()
+
+    return get_project_json(project_id)
+
+
+images = UploadSet('images', IMAGES)
+configure_uploads(app, (images,))
+
+
+@app.route('/upload', methods=['POST'])
+@set_parsers(MultiPartParser)
+def upload():
+    filename = images.save(request.files['imageFile'])
+
+    project_id = request.form.get('projectId')
+
+    media = Media('test', images.path(filename))
+    db.session.add(media)
+    db.session.commit()
+
+    project_media = ProjectMedia(project_id, media.id)
+    db.session.add(project_media)
+    db.session.commit()
 
     return get_project_json(project_id)
 

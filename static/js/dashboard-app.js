@@ -1,7 +1,7 @@
 (function(angular) {
   'use strict';
 
-angular.module('dashboard', ['ngRoute', 'dbResource'])
+angular.module('dashboard', ['ngRoute', 'dbResource', 'ngFileUpload'])
   .config(function ($interpolateProvider, $routeProvider) {
 
     $routeProvider
@@ -68,8 +68,7 @@ angular.module('dashboard', ['ngRoute', 'dbResource'])
     };
   })
 
-  .controller('EditProjectController', function ($scope, $location, $routeParams, Project, Category) {
-    $scope.editTitle = false;
+  .controller('EditProjectController', function ($scope, $location, $routeParams, Project, Category, Upload) {
 
     $scope.id = $routeParams.projectId;
     Project.getById($scope.id).$promise.then(function (project) {
@@ -91,8 +90,6 @@ angular.module('dashboard', ['ngRoute', 'dbResource'])
         tags = rawTags.split(/\s*,\s*/);
       }
 
-      console.log(category);
-
       Project.update(id, title, desc, category, tags)
         .$promise.then(function (project) {
           $scope.project = project;
@@ -106,15 +103,14 @@ angular.module('dashboard', ['ngRoute', 'dbResource'])
       });
     };
 
-    $scope.startEdit = function(editTitle) {
-      console.log(editTitle);
-      if (editTitle) {
-        $scope.editTitle = false;
-      } else {
-        $scope.editTitle = true;
-      }
-
-      console.log($scope.editTitle);
+    $scope.upload = function(imageFile) {
+      Upload.upload({
+        url: '/upload',
+        data: {'imageFile': imageFile, 'projectId': $scope.id}
+      }).then(function (resp) {
+        console.log(resp.data);
+        $scope.project = resp.data;
+      });
     };
   })
 

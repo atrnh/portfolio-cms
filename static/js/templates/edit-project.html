@@ -23,5 +23,13 @@
           ng-options="category as category.title for category in categories">
     </select></br>
   <input ng-model="rawTags" type="text" placeholder="New tags" /></br>
-  <button ng-click="updateProject(project.title, project.desc, thisCategory.id, rawTags)">Submit</button>
+  <input type="file" ngf-select ng-model="imageFile" name="file"
+             accept="image/*" ngf-max-size="20MB">
+  <button ng-click="upload(imageFile)">Upload</button></br>
+  <button ng-click="updateProject(project.title, project.desc, thisCategory.id, rawTags)">Save All</button>
+
+  <div>
+    <img ng-repeat="media in project.media"
+         ng-src="/{[{ media.source_url }]}">
+  </div>
 </section>
