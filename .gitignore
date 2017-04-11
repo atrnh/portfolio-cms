@@ -1,4 +1,4 @@
 env
 *.pyc
 static/js/demo.js
-static/js/ng-file-upload-bower-12.2.13
+static/ng-file-upload-bower-12.2.13/
