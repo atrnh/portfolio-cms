@@ -13,9 +13,9 @@
                       field-value="project.desc"
                       on-update="updateProject(project.title, value, this.Category.id, rawTags)">
       </editable-field></br>
-      <b>Category:</b> {[{ thisCategory.title }]}</br>
+      <b>Category:</b> ~*~* thisCategory.title *~*~</br>
       <b>Tags:</b>
-      <button ng-repeat="tag in project.tags" ng-click="deleteTag(tag.code)">{[{ tag.code }]} x</button>
+      <button ng-repeat="tag in project.tags" ng-click="deleteTag(tag.code)">~*~* tag.code *~*~ x</button>
     </i>
   </p>
   <select ng-show="categories"
@@ -30,6 +30,6 @@
 
   <div>
     <img ng-repeat="media in project.media"
-         ng-src="/{[{ media.source_url }]}">
+         ng-src="/~*~* media.source_url *~*~">
   </div>
 </section>

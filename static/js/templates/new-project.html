@@ -3,7 +3,7 @@
   <input ng-model="title" type="text" placeholder="Title"></br>
   <input ng-model="desc" type="text" placeholder="Description"></br>
     <select ng-show="categories" ng-model="categoryId">
-        <option ng-repeat="category in categories" ng-value="category.id">{[{ category.title }]}</option>
+        <option ng-repeat="category in categories" ng-value="category.id">~*~* category.title *~*~</option>
     </select></br>
   <input ng-model="rawTags" type="text" placeholder="comma-separated tags"></br>
   <button ng-click="addProject(title, desc, categoryId, rawTags)">Submit</button>

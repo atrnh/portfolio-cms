@@ -4,8 +4,8 @@ angular.module('dbResource', ['ngResource'])
 
   .config(function ($interpolateProvider) {
     $interpolateProvider
-      .startSymbol('{[{')
-      .endSymbol('}]}');
+      .startSymbol('~*~*')
+      .endSymbol('*~*~');
   })
 
   // Project service for getting project data from server
