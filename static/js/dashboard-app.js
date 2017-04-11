@@ -126,13 +126,13 @@ angular.module('dashboard', ['ngRoute', 'dbResource'])
     };
   })
 
-  .controller('EditCategoryController', function ($scope, $location, $routeParams, Category) {
+  .controller('EditCategoryController', function ($scope, $routeParams, Category) {
     $scope.id = $routeParams.categoryId;
     $scope.category = Category.getById($scope.id);
 
     $scope.updateCategory = function (title, desc, id=$scope.id) {
-      Category.update(id, title, desc).$promise.then(function (categories) {
-        $location.path('/');
+      Category.update(id, title, desc).$promise.then(function (category) {
+        $scope.category = category;
       });
     };
   })

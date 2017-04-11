@@ -236,10 +236,13 @@ class Tag(db.Model, JSONMixin):
 
         # Get existing tags
         existing_tags = cls.query.filter(cls.code.in_(tags)).all()
+        existing_tag_codes = set([e_tag.code for e_tag
+                                  in existing_tags
+                                  ])
         # Make new Tag objects if they do not exist
         new_tags = [
             cls(tag) for tag in tags
-            if tag not in set([e_tag.code for e_tag in existing_tags])
+            if tag not in existing_tag_codes
         ]
 
         db.session.add_all(new_tags)

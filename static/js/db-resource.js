@@ -134,8 +134,7 @@ angular.module('dbResource', ['ngResource'])
       update: function(id, title, desc) {
         return $resource('/admin/category/:categoryId', {categoryId: id}, {
           'post': {
-            method: 'POST',
-            isArray: true
+            method: 'POST'
           }
         }).post({}, {'title': title, 'desc': desc});
       }

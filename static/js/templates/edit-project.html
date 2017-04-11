@@ -1,22 +1,23 @@
 <section>
   <h2>Edit Project</h2>
   <h3>
-    <span ng-show="!editTitle">
-      {[{ project.title }]}
-      <a ng-click="startEdit(editTitle)">edit</a>
-    </span>
-    <input ng-show="editTitle" ng-model="project.title" type="text" placeholder="New Title"/>
+    <editable-field field-type="text"
+                    field-value="project.title"
+                    on-update="updateProject(value, project.desc, thisCategory.id, rawTags)">
+    </editable-field>
   </h3>
   <p>
     <i>
-      {[{ project.desc }]}</br>
+      <b>Description:</b></br>
+      <editable-field field-type="text"
+                      field-value="project.desc"
+                      on-update="updateProject(project.title, value, this.Category.id, rawTags)">
+      </editable-field></br>
       <b>Category:</b> {[{ thisCategory.title }]}</br>
       <b>Tags:</b>
       <button ng-repeat="tag in project.tags" ng-click="deleteTag(tag.code)">{[{ tag.code }]} x</button>
     </i>
   </p>
-  <!-- <input ng-model="project.title" type="text" placeholder="New Title"/></br> -->
-  <input ng-model="project.desc" type="text" placeholder="New Description"/></br>
   <select ng-show="categories"
           ng-model="thisCategory"
           ng-options="category as category.title for category in categories">

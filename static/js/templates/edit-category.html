@@ -1,18 +1,17 @@
 <section>
   <h2>Edit Category</h2>
   <h3>
-    {[{ category.title }]}
+    <editable-field field-type="text"
+                    field-value="category.title"
+                    on-update="updateCategory(value, category.desc)">
+    </editable-field>
   </h3>
   <p>
-    <i>{[{ category.desc }]}</i>
+    <i>
+      <editable-field field-type="text"
+                      field-value="category.desc"
+                      on-update="updateCategory(category.title, value)">
+      </editable-field>
+    </i>
   </p>
-  <input ng-model="title"
-         type="text"
-         placeholder="New Title"
-         ></br>
-  <input ng-model="desc"
-         type="text"
-         placeholder="New Description"
-         ></br>
-  <button ng-click="updateCategory(title, desc)">Submit</button>
 </section>

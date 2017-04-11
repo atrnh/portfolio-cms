@@ -33,13 +33,14 @@ def view_portfolio():
 
 
 @app.route('/categories.json')
-def get_categories_json():
+def get_categories_json(load_all=False):
     """Return JSON list of all categories in database.
 
     If loadAll is present, greedily load all nested objects.
     """
 
-    load_all = request.args.get('loadAll')
+    if not load_all:
+        load_all = request.args.get('loadAll')
 
     if load_all:
         categories = Category.query.options(db.joinedload('projects')
@@ -55,10 +56,11 @@ def get_categories_json():
 
 
 @app.route('/category.json')
-def get_category_json():
+def get_category_json(category_id=None):
     """Return JSON category."""
 
-    category_id = request.args.get('categoryId')
+    if not category_id:
+        category_id = request.args.get('categoryId')
 
     category = Category.query.options(
         db.joinedload('projects')
@@ -82,9 +84,10 @@ def get_category_projects_json():
             db.joinedload('projects')
         ).filter_by(id=category_id).one().projects
 
-        return Response(Project.get_json_from_list(category_projects),
-                        mimetype='application/json'
-                        )
+        return jsonify_list(
+            Project.get_json_from_list(category_projects)
+        )
+
     else:
         projects = Project.query.all()
 
@@ -134,7 +137,7 @@ def add_category():
     db.session.add(category)
     db.session.commit()
 
-    return redirect('/categories.json')
+    return get_categories_json(True)
 
 
 @app.route('/admin/category/<category_id>', methods=['DELETE', 'POST'])
@@ -145,12 +148,7 @@ def update_category(category_id):
         db.session.delete(Category.query.get(category_id))
         db.session.commit()
 
-        categories = Category.query.options(db.joinedload('projects')
-                                              .joinedload('media')
-                                            ).order_by(Category.id
-                                                       ).all()
-
-        return jsonify_list(Category.get_json_from_list(categories))
+        return get_categories_json(True)
 
     elif request.method == 'POST':
         data = json.loads(request.data.decode())
@@ -168,12 +166,7 @@ def update_category(category_id):
 
         db.session.commit()
 
-        categories = Category.query.options(db.joinedload('projects')
-                                              .joinedload('media')
-                                            ).order_by(Category.id
-                                                       ).all()
-
-        return jsonify_list(Category.get_json_from_list(categories))
+        return get_category_json(category_id)
 
 
 @app.route('/admin/project', methods=['POST'])
@@ -216,12 +209,7 @@ def update_project(project_id):
         db.session.delete(project)
         db.session.commit()
 
-        categories = Category.query.options(db.joinedload('projects')
-                                              .joinedload('media')
-                                            ).order_by(Category.id
-                                                       ).all()
-
-        return jsonify_list(Category.get_json_from_list(categories))
+        return get_categories_json(True)
 
     elif request.method == 'POST':
         data = json.loads(request.data.decode())
