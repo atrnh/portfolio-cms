@@ -115,10 +115,19 @@ angular.module('dashboard', ['ngRoute', 'dbResource', 'ngFileUpload'])
     $scope.updateMedia = function(media, prop, value) {
       var obj = {};
       obj[prop] = value;
-      Media.update(media.id, obj)
+      Media.update($scope.id, media.id, obj)
         .$promise.then(function (resp) {
           media[prop] = value;
         });
+    };
+
+    $scope.deleteMedia = function(media) {
+      Media.delete($scope.id, media.id).$promise.then(function (resp) {
+        var idx = $scope.project.media.indexOf(media);
+        if (idx >= 0) {
+          $scope.project.media.splice(idx, 1);
+        }
+      });
     };
   })
 

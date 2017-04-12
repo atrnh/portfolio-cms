@@ -259,8 +259,9 @@ configure_uploads(app, (images,))
 
 
 @app.route('/upload', methods=['POST'])
-# @set_parsers(MultiPartParser)
 def upload():
+    """Handle uploading new images."""
+
     filename = images.save(request.files['imageFile'])
 
     project_id = request.form.get('projectId')
@@ -276,23 +277,38 @@ def upload():
     return get_project_json(project_id)
 
 
-@app.route('/admin/media/<media_id>', methods=['POST'])
-def update_media(media_id):
-    data = json.loads(request.data.decode())
-
-    title = data.get('title')
-    desc = data.get('desc')
+@app.route('/admin/project/<project_id>/media/<media_id>', methods=['POST', 'DELETE'])
+def update_media(project_id, media_id):
+    """Update or delete media."""
 
     media = Media.query.get(media_id)
 
-    if title:
-        media.title = title
-        db.session.commit()
-    if desc:
-        media.desc = desc
+    if request.method == 'POST':
+        data = json.loads(request.data.decode())
+
+        title = data.get('title')
+        desc = data.get('desc')
+
+        if title:
+            media.title = title
+            db.session.commit()
+        if desc:
+            media.desc = desc
+            db.session.commit()
+
+        return jsonify_list(media.get_attributes())
+
+    elif request.method == 'DELETE':
+        project_media = ProjectMedia.query.filter_by(project_id=project_id,
+                                                     media_id=media_id
+                                                     ).one()
+        db.session.delete(project_media)
         db.session.commit()
 
-    return jsonify_list(media.get_attributes())
+        db.session.delete(media)
+        db.session.commit()
+
+        return get_project_json(project_id)
 
 
 def jsonify_list(objects):

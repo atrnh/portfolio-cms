@@ -33,7 +33,8 @@
     <ul>
       <li ng-repeat="media in project.media">
         <edit-media media="media"
-                    on-update="updateMedia(media, prop, value)">
+                    on-update="updateMedia(media, prop, value)"
+                    on-delete="deleteMedia(media)">
         </edit-media>
       </li>
     </ul>

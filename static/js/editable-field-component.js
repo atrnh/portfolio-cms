@@ -24,6 +24,10 @@ function EditMediaController($scope, $element, $attrs) {
   ctrl.update = function(prop, value) {
     ctrl.onUpdate({media: ctrl.media, prop: prop, value: value});
   };
+
+  ctrl.delete = function() {
+    ctrl.onDelete({media: ctrl.media});
+  };
 }
 
 angular.module('dashboard')
@@ -42,7 +46,8 @@ angular.module('dashboard')
     controller: EditMediaController,
     bindings: {
       media: '<',
-      onUpdate: '&'
+      onUpdate: '&',
+      onDelete: '&'
     }
   })
 ;

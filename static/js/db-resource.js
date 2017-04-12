@@ -143,12 +143,20 @@ angular.module('dbResource', ['ngResource'])
 
   .factory('Media', function ($resource) {
     return {
-      update: function(id, obj) {
-        return $resource('/admin/media/:mediaId', {mediaId: id}, {
+      update: function(pId, mId, obj) {
+        return $resource('/admin/project/:projectId/media/:mediaId', {projectId: pId, mediaId: mId}, {
           'post': {
             method: 'POST'
           }
         }).post({}, obj);
+      },
+
+      delete: function(pId, mId) {
+        return $resource('/admin/project/:projectId/media/:mediaId', {projectId: pId, mediaId: mId}, {
+          'delete': {
+            method: 'DELETE'
+          }
+        }).delete();
       }
     };
   })
