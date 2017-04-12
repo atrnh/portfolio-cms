@@ -1,4 +1,4 @@
-<section>
+<section ng-controller="EditProjectController">
   <h2>Edit Project</h2>
   <h3>
     <editable-field field-type="text"
@@ -11,25 +11,31 @@
       <b>Description:</b></br>
       <editable-field field-type="text"
                       field-value="project.desc"
-                      on-update="updateProject(project.title, value, this.Category.id, rawTags)">
+                      on-update="updateProject(project.title, value, thisCategory.id, rawTags)">
       </editable-field></br>
-      <b>Category:</b> ~*~* thisCategory.title *~*~</br>
+      <b>Category:</b>
+      <select ng-show="categories"
+              ng-model="thisCategory"
+              ng-options="category as category.title for category in categories">
+      </select></br>
       <b>Tags:</b>
       <button ng-repeat="tag in project.tags" ng-click="deleteTag(tag.code)">~*~* tag.code *~*~ x</button>
     </i>
   </p>
-  <select ng-show="categories"
-          ng-model="thisCategory"
-          ng-options="category as category.title for category in categories">
-    </select></br>
+
   <input ng-model="rawTags" type="text" placeholder="New tags" /></br>
   <input type="file" ngf-select ng-model="imageFile" name="file"
              accept="image/*" ngf-max-size="20MB">
   <button ng-click="upload(imageFile)">Upload</button></br>
   <button ng-click="updateProject(project.title, project.desc, thisCategory.id, rawTags)">Save All</button>
 
-  <div>
-    <img ng-repeat="media in project.media"
-         ng-src="/~*~* media.source_url *~*~">
-  </div>
+  <section id="edit-media">
+    <ul>
+      <li ng-repeat="media in project.media">
+        <edit-media media="media"
+                    on-update="updateMedia(media, prop, value)">
+        </edit-media>
+      </li>
+    </ul>
+  </section>
 </section>

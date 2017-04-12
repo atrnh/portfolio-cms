@@ -18,13 +18,32 @@ function EditableFieldController($scope, $element, $attrs) {
   };
 }
 
-angular.module('dashboard').component('editableField', {
-  templateUrl: '/static/js/templates/editable-field.html',
-  controller: EditableFieldController,
-  bindings: {
-    fieldValue: '<',
-    fieldType: '@?',
-    onUpdate: '&'
-  }
-});
+function EditMediaController($scope, $element, $attrs) {
+  var ctrl = this;
+
+  ctrl.update = function(prop, value) {
+    ctrl.onUpdate({media: ctrl.media, prop: prop, value: value});
+  };
+}
+
+angular.module('dashboard')
+  .component('editableField', {
+    templateUrl: '/static/js/templates/editable-field.html',
+    controller: EditableFieldController,
+    bindings: {
+      fieldValue: '<',
+      fieldType: '@?',
+      onUpdate: '&'
+    }
+  })
+
+  .component('editMedia', {
+    templateUrl: '/static/js/templates/edit-media.html',
+    controller: EditMediaController,
+    bindings: {
+      media: '<',
+      onUpdate: '&'
+    }
+  })
+;
 })(window.angular);

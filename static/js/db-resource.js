@@ -140,5 +140,17 @@ angular.module('dbResource', ['ngResource'])
       }
     };
   })
+
+  .factory('Media', function ($resource) {
+    return {
+      update: function(id, obj) {
+        return $resource('/admin/media/:mediaId', {mediaId: id}, {
+          'post': {
+            method: 'POST'
+          }
+        }).post({}, obj);
+      }
+    };
+  })
 ;
 })(window.angular);

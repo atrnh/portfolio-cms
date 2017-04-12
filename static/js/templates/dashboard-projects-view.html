@@ -11,7 +11,7 @@
     <li ng-repeat="category in categories"
         class="category">
       <span>
-        <a href="#/edit/category/~*~* category.id *~*~">
+        <a ng-href="#/edit/category/~*~* category.id *~*~">
           ~*~* category.title *~*~
         </a>
         <button ng-if="category.projects.length === 0" ng-click="deleteCategory(category.id)">
@@ -21,7 +21,7 @@
       <ul ng-show="category.projects">
         <li ng-repeat="project in category.projects">
           <span>
-            <a href="#/edit/project/~*~* project.id *~*~">
+            <a ng-href="#/edit/project/~*~* project.id *~*~">
               ~*~* project.title *~*~
             </a>
             <button ng-click="deleteProject(project.id)">

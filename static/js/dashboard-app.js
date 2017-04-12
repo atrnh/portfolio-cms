@@ -26,8 +26,7 @@ angular.module('dashboard', ['ngRoute', 'dbResource', 'ngFileUpload'])
       })
 
       .when('/edit/project/:projectId', {
-        templateUrl: '/static/js/templates/edit-project.html',
-        controller: 'EditProjectController'
+        templateUrl: '/static/js/templates/edit-project.html'
       })
       ;
   })
@@ -68,7 +67,7 @@ angular.module('dashboard', ['ngRoute', 'dbResource', 'ngFileUpload'])
     };
   })
 
-  .controller('EditProjectController', function ($scope, $location, $routeParams, Project, Category, Upload) {
+  .controller('EditProjectController', function ($scope, $location, $routeParams, Project, Category, Upload, Media) {
 
     $scope.id = $routeParams.projectId;
     Project.getById($scope.id).$promise.then(function (project) {
@@ -111,6 +110,15 @@ angular.module('dashboard', ['ngRoute', 'dbResource', 'ngFileUpload'])
         console.log(resp.data);
         $scope.project = resp.data;
       });
+    };
+
+    $scope.updateMedia = function(media, prop, value) {
+      var obj = {};
+      obj[prop] = value;
+      Media.update(media.id, obj)
+        .$promise.then(function (resp) {
+          media[prop] = value;
+        });
     };
   })
 

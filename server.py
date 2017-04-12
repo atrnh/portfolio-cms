@@ -259,7 +259,7 @@ configure_uploads(app, (images,))
 
 
 @app.route('/upload', methods=['POST'])
-@set_parsers(MultiPartParser)
+# @set_parsers(MultiPartParser)
 def upload():
     filename = images.save(request.files['imageFile'])
 
@@ -274,6 +274,25 @@ def upload():
     db.session.commit()
 
     return get_project_json(project_id)
+
+
+@app.route('/admin/media/<media_id>', methods=['POST'])
+def update_media(media_id):
+    data = json.loads(request.data.decode())
+
+    title = data.get('title')
+    desc = data.get('desc')
+
+    media = Media.query.get(media_id)
+
+    if title:
+        media.title = title
+        db.session.commit()
+    if desc:
+        media.desc = desc
+        db.session.commit()
+
+    return jsonify_list(media.get_attributes())
 
 
 def jsonify_list(objects):

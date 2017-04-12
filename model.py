@@ -271,7 +271,7 @@ class Media(db.Model, JSONMixin):
 
     thumbnail = db.relationship('Thumbnail')
 
-    projects = db.relationship('Media', secondary='projects_media')
+    projects = db.relationship('Project', secondary='projects_media')
 
     def __init__(self, title, source_url, desc=None):
         """Instantiate a Media."""
@@ -409,20 +409,6 @@ def example_data():
                                  ),
                         ])
 
-    db.session.add_all([Media('Test Image',
-                              'test.jpg',
-                              'This is a test image.'),
-                        Media('Test Cat',
-                              'cat.jpg',
-                              'Test image of a cat.'),
-                        Media('Test Sculpture',
-                              'sculpture.jpg',
-                              'A test sculpture.'),
-                        Media('Cool Test',
-                              'cool.jpg',
-                              'Another fake, test image.'),
-                        ])
-
     db.session.add_all([Project('Test Project',
                                 desc='This is a test project.'),
                         Project('Cool Cats',
@@ -433,12 +419,6 @@ def example_data():
 
     db.session.add_all([Tag('test-tag'),
                         Tag('animals'),
-                        ])
-
-    db.session.add_all([Thumbnail('test_thumb.jpg'),
-                        Thumbnail('cat_thumb.jpg'),
-                        Thumbnail('sculpture_thumb.jpg'),
-                        Thumbnail('cool_thumb.jpg'),
                         ])
 
     db.session.add_all([Config('title', 'My Portfolio')])
@@ -454,7 +434,6 @@ def example_associations():
 
     categories = Category.query.all()
     projects = Project.query.all()
-    media = Media.query.all()
 
     db.session.add_all([CategoryProject(categories[0].id,
                                         projects[0].id),
@@ -462,19 +441,6 @@ def example_associations():
                                         projects[1].id),
                         CategoryProject(categories[2].id,
                                         projects[2].id),
-                        ])
-    db.session.commit()
-
-    db.session.add_all([ProjectMedia(projects[0].id,
-                                     media[0].id),
-                        ProjectMedia(projects[1].id,
-                                     media[1].id),
-                        ProjectMedia(projects[1].id,
-                                     media[2].id),
-                        ProjectMedia(projects[2].id,
-                                     media[2].id),
-                        ProjectMedia(projects[2].id,
-                                     media[3].id),
                         ])
     db.session.commit()
 
