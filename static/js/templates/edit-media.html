@@ -1,0 +1,11 @@
+<div>
+  <editable-field field-type="text"
+                  field-value="$ctrl.media.title"
+                  on-update="$ctrl.update('title', value)">
+  </editable-field></br>
+  <editable-field field-type="text"
+                  field-value="$ctrl.media.desc"
+                  on-update="$ctrl.update('desc', value)">
+  </editable-field></br>
+  <img ng-src="/~*~* $ctrl.media.source_url *~*~" />
+</div>
