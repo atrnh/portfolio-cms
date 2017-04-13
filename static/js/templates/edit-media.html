@@ -2,10 +2,12 @@
   <button ng-click="$ctrl.delete()">delete</button></br>
   <editable-field field-type="text"
                   field-value="$ctrl.media.title"
+                  enable-html="false"
                   on-update="$ctrl.update('title', value)">
   </editable-field></br>
   <editable-field field-type="text"
                   field-value="$ctrl.media.desc"
+                  enable-html="false"
                   on-update="$ctrl.update('desc', value)">
   </editable-field></br>
   <img ng-src="/~*~* $ctrl.media.source_url *~*~" />

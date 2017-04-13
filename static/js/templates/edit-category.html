@@ -3,15 +3,15 @@
   <h3>
     <editable-field field-type="text"
                     field-value="category.title"
-                    on-update="updateCategory(value, category.desc)">
+                    enable-html="false"
+                    on-update="update('title', value)">
     </editable-field>
   </h3>
   <p>
-    <i>
-      <editable-field field-type="text"
-                      field-value="category.desc"
-                      on-update="updateCategory(category.title, value)">
-      </editable-field>
-    </i>
+    <editable-field field-type="textarea"
+                    field-value="category.desc"
+                    enable-html="true"
+                    on-update="update('desc', value)">
+    </editable-field>
   </p>
 </section>

@@ -1,8 +1,20 @@
 <span ng-switch="$ctrl.editMode">
-  <input ng-switch-when="true"
-         type="~*~* $ctrl.fieldType *~*~"
-         ng-model="$ctrl.fieldValue">
-  <span ng-switch-default>~*~* $ctrl.fieldValue *~*~</span>
+  <span ng-switch-when="true"
+        ng-switch="$ctrl.fieldType">
+
+    <textarea ng-switch-when="textarea"
+              ng-model="$ctrl.fieldValue">
+    </textarea>
+    <input ng-switch-default
+           type="~*~* $ctrl.fieldType *~*~"
+           ng-model="$ctrl.fieldValue" />
+  </span>
+  <span ng-switch-default
+        ng-switch="$ctrl.enableHtml">
+    <span ng-switch-when="true"
+          ng-bind-html="$ctrl.fieldValue"></span>
+    <span ng-switch-default>~*~* $ctrl.fieldValue *~*~</span>
+  </span>
 </span>
 <button ng-click="$ctrl.handleModeChange()">
   ~*~* $ctrl.editMode ? 'Save' : 'Edit' *~*~

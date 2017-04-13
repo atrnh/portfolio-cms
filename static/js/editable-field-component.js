@@ -37,6 +37,7 @@ angular.module('dashboard')
     bindings: {
       fieldValue: '<',
       fieldType: '@?',
+      enableHtml: '<',
       onUpdate: '&'
     }
   })

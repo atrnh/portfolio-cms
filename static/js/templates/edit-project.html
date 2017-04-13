@@ -3,29 +3,39 @@
   <h3>
     <editable-field field-type="text"
                     field-value="project.title"
-                    on-update="updateProject(value, project.desc, thisCategory.id, rawTags)">
+                    enable-html="false"
+                    on-update="update('title', value)">
     </editable-field>
   </h3>
-  <p>
-    <i>
-      <b>Description:</b></br>
-      <editable-field field-type="text"
+  <section id="project-data">
+      <b><i>Description:</i></b></br>
+      <editable-field field-type="textarea"
                       field-value="project.desc"
-                      on-update="updateProject(project.title, value, thisCategory.id, rawTags)">
+                      enable-html="true"
+                      on-update="update('desc', value)">
       </editable-field></br>
-      <b>Category:</b>
+      <b><i>Category: </i></b>
       <select ng-show="categories"
               ng-model="thisCategory"
-              ng-options="category as category.title for category in categories">
+              ng-options="category as category.title for category in categories"
+              ng-change="update('categoryId', thisCategory.id)">
       </select></br>
       <b>Tags:</b>
-      <button ng-repeat="tag in project.tags" ng-click="deleteTag(tag.code)">~*~* tag.code *~*~ x</button>
-    </i>
-  </p>
+      <div id="tag-input">
+        <button ng-repeat="tag in project.tags"
+                ng-click="deleteTag(tag.code)">
+          x ~*~* tag.code *~*~
+        </button>
+        <input ng-model="rawTag"
+               ng-keypress="handleTags($event)"
+               type="text"
+               placeholder="New tags" />
+      </div>
+  </section>
 
-  <input ng-model="rawTags" type="text" placeholder="New tags" /></br>
+  </br>
   <input type="file" ngf-select ng-model="imageFile" name="file"
-             accept="image/*" ngf-max-size="20MB">
+             accept="image/*" ngf-max-size="20MB" />
   <button ng-click="upload(imageFile)">Upload</button></br>
   <button ng-click="updateProject(project.title, project.desc, thisCategory.id, rawTags)">Save All</button>
 
