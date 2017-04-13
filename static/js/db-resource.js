@@ -76,6 +76,22 @@ angular.module('dbResource', ['ngResource'])
         });
       },
 
+      reUpdate: function(id, obj) {
+        return $resource('/admin/project/:projectId', {projectId: id}, {
+          'post': {
+            method: 'POST'
+          }
+        }).post({}, obj);
+      },
+
+      newTag: function(id, tagCode) {
+        return $resource('/admin/project/:projectId/new_tag', {projectId: id}, {
+          'post': {
+            method: 'POST'
+          }
+        }).post({}, {'tagCode': tagCode});
+      },
+
       deleteTag: function(id, tagCode) {
         return $resource(
           '/admin/project/:projectId/tag/:tagCode',
@@ -131,12 +147,12 @@ angular.module('dbResource', ['ngResource'])
         }).delete();
       },
 
-      update: function(id, title, desc) {
+      update: function(id, obj) {
         return $resource('/admin/category/:categoryId', {categoryId: id}, {
           'post': {
             method: 'POST'
           }
-        }).post({}, {'title': title, 'desc': desc});
+        }).post({}, obj);
       }
     };
   })

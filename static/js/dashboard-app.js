@@ -1,7 +1,7 @@
 (function(angular) {
   'use strict';
 
-angular.module('dashboard', ['ngRoute', 'dbResource', 'ngFileUpload'])
+angular.module('dashboard', ['ngRoute', 'dbResource', 'ngFileUpload', 'ngSanitize'])
   .config(function ($interpolateProvider, $routeProvider) {
 
     $routeProvider
@@ -93,7 +93,26 @@ angular.module('dashboard', ['ngRoute', 'dbResource', 'ngFileUpload'])
         .$promise.then(function (project) {
           $scope.project = project;
         });
-      $scope.editTitle = false;
+    };
+
+    $scope.update = function(prop, value) {
+      var obj = {};
+      obj[prop] = value;
+      Project.reUpdate($scope.id, obj)
+        .$promise.then(function (resp) {
+          $scope.project[prop] = value;
+        });
+    };
+
+    $scope.handleTags = function(keyEvent) {
+      var key = keyEvent.key;
+      if (key === ',') {
+        $scope.project.tags.push({'code': $scope.rawTag});
+        Project.newTag($scope.id, $scope.rawTag)
+          .$promise.then(function (tag) {
+            $scope.rawTag = null;
+          });
+      }
     };
 
     $scope.deleteTag = function(tagCode, id=$scope.id) {
@@ -143,9 +162,11 @@ angular.module('dashboard', ['ngRoute', 'dbResource', 'ngFileUpload'])
     $scope.id = $routeParams.categoryId;
     $scope.category = Category.getById($scope.id);
 
-    $scope.updateCategory = function (title, desc, id=$scope.id) {
-      Category.update(id, title, desc).$promise.then(function (category) {
-        $scope.category = category;
+    $scope.update = function (prop, value) {
+      var obj = {};
+      obj[prop] = value;
+      Category.update($scope.id, obj).$promise.then(function (category) {
+        $scope.category[prop] = value;
       });
     };
   })
