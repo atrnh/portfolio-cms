@@ -188,10 +188,11 @@ class Project(db.Model, JSONMixin):
                 db.session.commit()
 
         if tags:
+            project_tags = set([tag.code for tag in self.tags])
             # Filter out tags already in project_id
             filtered_tags = [tag for tag in tags
                              if tag not in
-                             set([p_tag.code for p_tag in self.tags])
+                             project_tags
                              ]
             # Make new tags
             tag_objects = Tag.create_tags(filtered_tags)
@@ -202,6 +203,18 @@ class Project(db.Model, JSONMixin):
             db.session.add_all([TagProject(self.id, tag.code)
                                 for tag in tag_objects
                                 ])
+            db.session.commit()
+
+    def attach_tag(self, new_tag):
+        """Attach new Tag to project."""
+
+        project_tags = set([tag.code for tag in self.tags])
+        print '\n\n\n\n\n\naaaaaaaa'
+        print new_tag
+        print '\n\n\n\n\n\n'
+
+        if new_tag.code not in project_tags:
+            db.session.add(TagProject(self.id, new_tag.code))
             db.session.commit()
 
 

@@ -8,9 +8,7 @@ from flask_uploads import UploadSet, IMAGES, configure_uploads
 from model import (Category, Project, Tag, Media, Thumbnail, ProjectMedia,
                    CategoryProject, TagProject, db, connect_to_db,)
 import json
-
-from flask.ext.api.decorators import set_parsers
-from flask.ext.api.parsers import MultiPartParser
+from sqlalchemy.orm import exc
 
 
 app = Flask(__name__)
@@ -232,6 +230,30 @@ def update_project(project_id):
         db.session.commit()
 
         return get_project_json(project_id)
+
+
+@app.route('/admin/project/<project_id>/new_tag', methods=['POST'])
+def tag_project(project_id):
+    """Attach a tag to project."""
+
+    data = json.loads(request.data.decode())
+    tag_code = data.get('tagCode')
+    project = Project.query.get(project_id)
+    tag = Tag.query.get(tag_code)
+
+    if tag:
+        project.attach_tag(tag)
+
+        return jsonify_list(tag.get_attributes())
+
+    else:
+        tag = Tag(tag_code)
+        db.session.add(tag)
+        db.session.commit()
+
+        project.attach_tag(tag)
+
+        return jsonify_list(tag.get_attributes())
 
 
 @app.route('/admin/project/<project_id>/tag/<tag_code>',
