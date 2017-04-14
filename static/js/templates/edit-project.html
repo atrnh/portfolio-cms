@@ -3,7 +3,6 @@
   <h3>
     <editable-field field-type="text"
                     field-value="project.title"
-                    enable-html="false"
                     on-update="update('title', value)">
     </editable-field>
   </h3>
@@ -23,7 +22,7 @@
       <b>Tags:</b>
       <div id="tag-input">
         <button ng-repeat="tag in project.tags"
-                ng-click="deleteTag(tag.code)">
+                ng-click="deleteTag(tag)">
           x ~*~* tag.code *~*~
         </button>
         <input ng-model="rawTag"
@@ -37,11 +36,20 @@
   <input type="file" ngf-select ng-model="imageFile" name="file"
              accept="image/*" ngf-max-size="20MB" />
   <button ng-click="upload(imageFile)">Upload</button></br>
-  <button ng-click="updateProject(project.title, project.desc, thisCategory.id, rawTags)">Save All</button>
 
   <section id="edit-media">
     <ul>
       <li ng-repeat="media in project.media">
+        <!-- Set main image -->
+        <input type="radio"
+               ng-model="project.main_img_id"
+               ng-value="media.id"
+               ng-change="update('mainImgId', project.main_img_id)"
+               />
+        <span ng-switch="project.main_img_id === media.id">
+          <span ng-switch-when="true">Current main image.</span>
+          <span ng-switch-default>Set main image.</span>
+        </span>
         <edit-media media="media"
                     on-update="updateMedia(media, prop, value)"
                     on-delete="deleteMedia(media)">

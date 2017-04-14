@@ -1,21 +1,26 @@
 <span ng-switch="$ctrl.editMode">
+  <!-- Show input when editMode is true -->
   <span ng-switch-when="true"
         ng-switch="$ctrl.fieldType">
-
+    <!-- Enable/disable input vs textarea -->
     <textarea ng-switch-when="textarea"
-              ng-model="$ctrl.fieldValue">
+              ng-model="$ctrl.fieldValue"
+              ng-keypress="$ctrl.handleModeChange($event)">
     </textarea>
     <input ng-switch-default
            type="~*~* $ctrl.fieldType *~*~"
-           ng-model="$ctrl.fieldValue" />
+           ng-model="$ctrl.fieldValue"
+           ng-keypress="$ctrl.handleModeChange($event)" />
   </span>
+  <!-- Show current field value on default -->
   <span ng-switch-default
         ng-switch="$ctrl.enableHtml">
+    <!-- Enable/disable HTML rendering -->
     <span ng-switch-when="true"
           ng-bind-html="$ctrl.fieldValue"></span>
     <span ng-switch-default>~*~* $ctrl.fieldValue *~*~</span>
   </span>
 </span>
-<button ng-click="$ctrl.handleModeChange()">
+<button ng-click="$ctrl.handleModeChange($event)">
   ~*~* $ctrl.editMode ? 'Save' : 'Edit' *~*~
 </button>
