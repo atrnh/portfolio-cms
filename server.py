@@ -70,6 +70,7 @@ def get_category_json(category_id=None):
 
     category = Category.query.options(
         db.joinedload('projects')
+          .joinedload('main_img')
     ).get(category_id)
 
     return jsonify_list(category.get_attributes())
@@ -114,6 +115,18 @@ def get_project_json(project_id=None):
     ).get(project_id)
 
     return jsonify_list(project.get_attributes())
+
+
+@app.route('/media.json')
+def get_media_json(media_id=None):
+    """Return JSON media."""
+
+    if not media_id:
+        media_id = request.args.get('mediaId')
+
+    media = Media.query.get(media_id)
+
+    return jsonify_list(media.get_attributes())
 
 
 @app.route('/admin/dashboard/')
@@ -224,8 +237,9 @@ def update_project(project_id):
         desc = data.get('desc')
         category_id = data.get('categoryId')
         tags = data.get('tags')
+        main_img_id = data.get('mainImgId')
 
-        project.update(title, desc, category_id, tags)
+        project.update(title, desc, category_id, tags, main_img_id)
 
         db.session.commit()
 
@@ -296,7 +310,7 @@ def upload():
     db.session.add(project_media)
     db.session.commit()
 
-    return get_project_json(project_id)
+    return get_media_json(media.id)
 
 
 @app.route('/admin/project/<project_id>/media/<media_id>', methods=['POST', 'DELETE'])
