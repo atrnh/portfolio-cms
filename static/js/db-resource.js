@@ -2,10 +2,12 @@
   'use strict';
 angular.module('dbResource', ['ngResource'])
 
-  .config(function ($interpolateProvider) {
+  .config(function ($interpolateProvider, $locationProvider) {
     $interpolateProvider
       .startSymbol('~*~*')
       .endSymbol('*~*~');
+
+    $locationProvider.hashPrefix('');
   })
 
   // Project service for getting project data from server
@@ -173,7 +175,15 @@ angular.module('dbResource', ['ngResource'])
             method: 'DELETE'
           }
         }).delete();
-      }
+      },
+
+      getById: function(id) {
+        return $resource('/media.json', {mediaId: id}, {
+          'get': {
+            method: 'GET'
+          }
+        }).get();
+      },
     };
   })
 ;
