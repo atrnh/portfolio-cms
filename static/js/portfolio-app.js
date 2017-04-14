@@ -1,25 +1,36 @@
 (function(angular) {
   'use strict';
-angular.module('portfolio', ['dbResource'])
+angular.module('portfolio', ['dbResource', 'ngRoute', 'ngSanitize'])
 
-  .controller('PortfolioController', function ($scope, Project, Category) {
-    $scope.viewCategory = function(categoryId) {
-      Category.getById(categoryId)
-              .$promise.then(function (category) {
-                $scope.title = category.title;
-                $scope.content = category.projects;
-              });
-    };
+  .config(function ($routeProvider) {
+    $routeProvider
+      .when('/:categoryTitle/:id', {
+        templateUrl: '/static/js/templates/category-view.html',
+        controller: 'CategoryViewController'
+      })
 
-    $scope.viewProject = function(projectId) {
-      Project.getById(projectId)
-             .$promise.then(function (project) {
-               $scope.title = project.title;
-               $scope.content = project.media;
-             });
-    };
+      .when('/:categoryTitle/:categoryId/:projectTitle/:id', {
+        templateUrl: '/static/js/templates/project-view.html',
+        controller: 'ProjectViewController'
+      })
+      ;
+    }
+  )
 
+  .controller('CategoryViewController', function ($scope, $routeParams, Category) {
+    Category.getById($routeParams.id)
+      .$promise.then(function (category) {
+        $scope.category = category;
+      }
+    );
+  })
 
+  .controller('ProjectViewController', function ($scope, $routeParams, Project) {
+    Project.getById($routeParams.id)
+      .$promise.then(function (project) {
+        $scope.project = project;
+      }
+    );
   })
 ;
 })(window.angular);
