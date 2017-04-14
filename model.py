@@ -41,6 +41,8 @@ class JSONMixin(object):
                         )
                     except IndexError:
                         attributes[attribute] = []
+                elif isinstance(value, db.Model):
+                    attributes[attribute] = json.loads(value.get_attributes())
                 else:
                     attributes[attribute] = value
 
@@ -161,7 +163,7 @@ class Project(db.Model, JSONMixin):
                                                         title=self.title,
                                                         )
 
-    def update(self, title=None, desc=None, category_id=None, tags=None):
+    def update(self, title=None, desc=None, category_id=None, tags=None, main_img_id=None):
         """Update a project's fields."""
 
         if title:
@@ -204,6 +206,9 @@ class Project(db.Model, JSONMixin):
                                 for tag in tag_objects
                                 ])
             db.session.commit()
+
+        if main_img_id:
+            self.main_img_id = main_img_id
 
     def attach_tag(self, new_tag):
         """Attach new Tag to project."""
