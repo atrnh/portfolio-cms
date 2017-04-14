@@ -70,30 +70,18 @@ angular.module('dashboard', ['ngRoute', 'dbResource', 'ngFileUpload', 'ngSanitiz
   .controller('EditProjectController', function ($scope, $location, $routeParams, Project, Category, Upload, Media) {
 
     $scope.id = $routeParams.projectId;
+
     Project.getById($scope.id).$promise.then(function (project) {
       $scope.project = project;
-      $scope.currCategory = project.categories[0].id;
-    });
 
-    Category.getAll().$promise.then(function (categories) {
-      $scope.categories = categories;
-      $scope.currCategoryIdx = categories.findIndex(function (category) {
-        return category.id === $scope.currCategory;
-      });
-      $scope.thisCategory = $scope.categories[$scope.currCategoryIdx];
-    });
-
-    $scope.updateProject = function(title, desc, category, rawTags, id=$scope.id) {
-      var tags;
-      if (rawTags) {
-        tags = rawTags.split(/\s*,\s*/);
-      }
-
-      Project.update(id, title, desc, category, tags)
-        .$promise.then(function (project) {
-          $scope.project = project;
+      Category.getAll().$promise.then(function (categories) {
+        $scope.categories = categories;
+        var idx = categories.findIndex(function (category) {
+          return category.id === project.categories[0].id;
         });
-    };
+        $scope.thisCategory = $scope.categories[idx];
+      });
+    });
 
     $scope.update = function(prop, value) {
       var obj = {};
@@ -115,9 +103,12 @@ angular.module('dashboard', ['ngRoute', 'dbResource', 'ngFileUpload', 'ngSanitiz
       }
     };
 
-    $scope.deleteTag = function(tagCode, id=$scope.id) {
-      Project.deleteTag(id, tagCode).$promise.then(function (project) {
-        $scope.project = project;
+    $scope.deleteTag = function(tag) {
+      Project.deleteTag($scope.id, tag.code).$promise.then(function (project) {
+        var idx = $scope.project.tags.indexOf(tag);
+        if (idx >= 0) {
+          $scope.project.tags.splice(idx, 1);
+        }
       });
     };
 
@@ -126,8 +117,7 @@ angular.module('dashboard', ['ngRoute', 'dbResource', 'ngFileUpload', 'ngSanitiz
         url: '/upload',
         data: {'imageFile': imageFile, 'projectId': $scope.id}
       }).then(function (resp) {
-        console.log(resp.data);
-        $scope.project = resp.data;
+        $scope.project.media.push(resp.data);
       });
     };
 
