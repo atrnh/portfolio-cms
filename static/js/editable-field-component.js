@@ -4,11 +4,15 @@ function EditableFieldController($scope, $element, $attrs) {
   var ctrl = this;
   ctrl.editMode = false;
 
-  ctrl.handleModeChange = function() {
-    if (ctrl.editMode) {
-      ctrl.onUpdate({value: ctrl.fieldValue});
+  ctrl.handleModeChange = function(evt) {
+    if (evt.type === 'click' || evt.key === 'Enter') {
+
+      if (ctrl.editMode) {
+          ctrl.onUpdate({value: ctrl.fieldValue});
+      }
+
+      ctrl.editMode = !ctrl.editMode;
     }
-    ctrl.editMode = !ctrl.editMode;
   };
 
   ctrl.$onInit = function() {
@@ -37,7 +41,7 @@ angular.module('dashboard')
     bindings: {
       fieldValue: '<',
       fieldType: '@?',
-      enableHtml: '<',
+      enableHtml: '<?',
       onUpdate: '&'
     }
   })
