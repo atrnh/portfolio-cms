@@ -1,0 +1,17 @@
+<section id="category-view">
+  <h2>~*~* category.title *~*~</h2>
+  <p ng-bind-html="category.desc"></p>
+
+  <div>
+    <ul ng-show="category.projects">
+      <li ng-repeat="project in category.projects">
+        <h3>
+          <a ng-href="#/~*~* category.title *~*~/~*~* category.id *~*~/~*~* project.title *~*~/~*~* project.id *~*~">
+            ~*~* project.title *~*~
+          </a>
+        </h3>
+        <img ng-src="/~*~* project.main_img.source_url *~*~" />
+      </li>
+    </ul>
+  </div>
+</section>

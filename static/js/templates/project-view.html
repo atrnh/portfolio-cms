@@ -1,0 +1,18 @@
+<section id="project-view">
+  <h2>~*~* project.title *~*~</h2>
+  <p ng-bind-html="project.desc"></p>
+
+  <div>
+    <ul ng-show="project.media">
+      <li ng-repeat="media in project.media">
+        <p>
+          ~*~* media.title *~*~
+        </p>
+        <p>
+          <i>~*~* media.desc *~*~</i>
+        </p>
+        <img ng-src="/~*~* media.source_url *~*~" />
+      </li>
+    </ul>
+  </div>
+</section>
