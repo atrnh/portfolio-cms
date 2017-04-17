@@ -10,7 +10,6 @@ angular.module('dbResource', ['ngResource'])
     $locationProvider.hashPrefix('');
   })
 
-  // Project service for getting project data from server
   .factory('Project', function ($resource) {
     return {
 
@@ -43,6 +42,7 @@ angular.module('dbResource', ['ngResource'])
         }).get();
       },
 
+      // Add a new project
       addNew: function(title, desc, categoryId, tags) {
         return $resource('/admin/project', {}, {
           'post': {
@@ -56,6 +56,7 @@ angular.module('dbResource', ['ngResource'])
         });
       },
 
+      // Delete a project
       delete: function(id) {
         return $resource('/admin/project/:projectId', {projectId: id}, {
           'delete': {
@@ -65,20 +66,8 @@ angular.module('dbResource', ['ngResource'])
         }).delete();
       },
 
-      update: function(id, title, desc, categoryId, tags) {
-        return $resource('/admin/project/:projectId', {projectId: id}, {
-          'post': {
-            method: 'POST'
-          }
-        }).post({}, {
-          'title': title,
-          'desc': desc,
-          'categoryId': categoryId,
-          'tags': tags
-        });
-      },
-
-      reUpdate: function(id, obj) {
+      // Update a project
+      update: function(id, obj) {
         return $resource('/admin/project/:projectId', {projectId: id}, {
           'post': {
             method: 'POST'
@@ -86,14 +75,16 @@ angular.module('dbResource', ['ngResource'])
         }).post({}, obj);
       },
 
-      newTag: function(id, tagCode) {
+      // Add a new tag to a project
+      newTag: function(id, tag) {
         return $resource('/admin/project/:projectId/new_tag', {projectId: id}, {
           'post': {
             method: 'POST'
           }
-        }).post({}, {'tagCode': tagCode});
+        }).post({}, tag);
       },
 
+      // Delete a tag from a project
       deleteTag: function(id, tagCode) {
         return $resource(
           '/admin/project/:projectId/tag/:tagCode',
@@ -132,6 +123,7 @@ angular.module('dbResource', ['ngResource'])
         }).get();
       },
 
+      // Add a new category
       addNew: function(title, desc) {
         return $resource('/admin/category', {}, {
           'post': {
@@ -140,6 +132,7 @@ angular.module('dbResource', ['ngResource'])
         }).post({}, {'title': title, 'desc': desc});
       },
 
+      // Delete a category
       delete: function(id) {
         return $resource('/admin/category/:categoryId', {categoryId: id}, {
           'delete': {
@@ -149,6 +142,7 @@ angular.module('dbResource', ['ngResource'])
         }).delete();
       },
 
+      // Update a category
       update: function(id, obj) {
         return $resource('/admin/category/:categoryId', {categoryId: id}, {
           'post': {
@@ -161,6 +155,8 @@ angular.module('dbResource', ['ngResource'])
 
   .factory('Media', function ($resource) {
     return {
+
+      // Update media
       update: function(pId, mId, obj) {
         return $resource('/admin/project/:projectId/media/:mediaId', {projectId: pId, mediaId: mId}, {
           'post': {
@@ -169,6 +165,7 @@ angular.module('dbResource', ['ngResource'])
         }).post({}, obj);
       },
 
+      // Delete media
       delete: function(pId, mId) {
         return $resource('/admin/project/:projectId/media/:mediaId', {projectId: pId, mediaId: mId}, {
           'delete': {
@@ -177,8 +174,33 @@ angular.module('dbResource', ['ngResource'])
         }).delete();
       },
 
+      // Get media JSON by ID
       getById: function(id) {
         return $resource('/media.json', {mediaId: id}, {
+          'get': {
+            method: 'GET'
+          }
+        }).get();
+      },
+    };
+  })
+
+  .factory('Tag', function ($resource) {
+    return {
+
+      // Get all tags in JSON array
+      getAll: function() {
+        return $resource('/tags.json', {}, {
+          'get': {
+            method: 'GET',
+            isArray: true
+          }
+        }).get();
+      },
+
+      // Get individual tag JSON
+      getByCode: function(code) {
+        return $resource('tag.json', {tagCode: code}, {
           'get': {
             method: 'GET'
           }

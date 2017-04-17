@@ -1,12 +1,18 @@
 (function(angular) {
   'use strict';
 
-angular.module('dashboard', ['ngRoute', 'dbResource', 'ngFileUpload', 'ngSanitize'])
+angular.module('dashboard', [
+  'ngRoute',
+  'dbResource',
+  'ngFileUpload',
+  'ngSanitize',
+  'ui.bootstrap',
+])
   .config(function ($interpolateProvider, $routeProvider) {
 
     $routeProvider
       .when('/', {
-        templateUrl: '/static/js/templates/dashboard-projects-view.html',
+        templateUrl: '/static/js/templates/dashboard-view-projects.html',
         controller: 'ProjectsController'
       })
 
@@ -31,23 +37,30 @@ angular.module('dashboard', ['ngRoute', 'dbResource', 'ngFileUpload', 'ngSanitiz
       ;
   })
 
-  .controller('ProjectsController', function ($scope, $location, Category, Project) {
-    Category.getAll('true').$promise.then(function (categories) {
-      $scope.categories = categories;
-    });
+  .controller(
+    'ProjectsController',
+    function ($scope, $location, Category, Project) {
 
-    $scope.deleteCategory = function (id) {
-      Category.delete(id).$promise.then(function (categories) {
+      Category.getAll('true').$promise.then(function (categories) {
         $scope.categories = categories;
       });
-    };
 
-    $scope.deleteProject = function (id) {
-      Project.delete(id).$promise.then(function (categories) {
-        $scope.categories = categories;
-      });
-    };
-  })
+      $scope.deleteCategory = function (id) {
+        Category.delete(id).$promise.then(function (category) {
+          var idx = $scope.categories.indexOf(category);
+          if (idx >= 0) {
+            $scope.categories.splice(idx, 1);
+          }
+        });
+      };
+
+      $scope.deleteProject = function (id) {
+        Project.delete(id).$promise.then(function (categories) {
+          $scope.categories = categories;
+        });
+      };
+    }
+  )
 
   .controller('NewProjectController', function ($scope, $location, Category, Project) {
     Category.getAll().$promise.then(function (categories) {
@@ -67,9 +80,13 @@ angular.module('dashboard', ['ngRoute', 'dbResource', 'ngFileUpload', 'ngSanitiz
     };
   })
 
-  .controller('EditProjectController', function ($scope, $location, $routeParams, Project, Category, Upload, Media) {
+  .controller('EditProjectController', function ($scope, $location, $routeParams, Project, Category, Upload, Media, Tag) {
 
     $scope.id = $routeParams.projectId;
+
+    Tag.getAll().$promise.then(function (tags) {
+      $scope.tags = tags;
+    });
 
     Project.getById($scope.id).$promise.then(function (project) {
       $scope.project = project;
@@ -86,7 +103,7 @@ angular.module('dashboard', ['ngRoute', 'dbResource', 'ngFileUpload', 'ngSanitiz
     $scope.update = function(prop, value) {
       var obj = {};
       obj[prop] = value;
-      Project.reUpdate($scope.id, obj)
+      Project.update($scope.id, obj)
         .$promise.then(function (resp) {
           $scope.project[prop] = value;
         });
@@ -94,11 +111,14 @@ angular.module('dashboard', ['ngRoute', 'dbResource', 'ngFileUpload', 'ngSanitiz
 
     $scope.handleTags = function(keyEvent) {
       var key = keyEvent.key;
-      if (key === ',') {
-        $scope.project.tags.push({'code': $scope.rawTag});
-        Project.newTag($scope.id, $scope.rawTag)
-          .$promise.then(function (tag) {
-            $scope.rawTag = null;
+      if (key === ',' || key === 'Enter') {
+        if (typeof $scope.newTag === 'string') {
+          $scope.newTag = {'code': $scope.newTag};
+        }
+          $scope.project.tags.push($scope.newTag);
+          Project.newTag($scope.id, $scope.newTag)
+            .$promise.then(function (tag) {
+              $scope.newTag = null;
           });
       }
     };

@@ -25,10 +25,13 @@
                 ng-click="deleteTag(tag)">
           x ~*~* tag.code *~*~
         </button>
-        <input ng-model="rawTag"
-               ng-keypress="handleTags($event)"
-               type="text"
-               placeholder="New tags" />
+        <input type="text"
+               placeholder="New Tags"
+               ng-model="newTag"
+               uib-typeahead="tag as tag.code for tag in tags |
+                              filter:$viewValue"
+               ng-keypress="handleTags($event)" />
+
       </div>
   </section>
 

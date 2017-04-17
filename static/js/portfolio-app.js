@@ -4,14 +4,19 @@ angular.module('portfolio', ['dbResource', 'ngRoute', 'ngSanitize'])
 
   .config(function ($routeProvider) {
     $routeProvider
-      .when('/:categoryTitle/:id', {
-        templateUrl: '/static/js/templates/category-view.html',
+      .when('/category/:categoryTitle/:id', {
+        templateUrl: '/static/js/templates/view-category.html',
         controller: 'CategoryViewController'
       })
 
-      .when('/:categoryTitle/:categoryId/:projectTitle/:id', {
-        templateUrl: '/static/js/templates/project-view.html',
+      .when('/project/:projectTitle/:id', {
+        templateUrl: '/static/js/templates/view-project.html',
         controller: 'ProjectViewController'
+      })
+
+      .when('/tag/:code', {
+        templateUrl: '/static/js/templates/view-tag.html',
+        controller: 'TagViewController'
       })
       ;
     }
@@ -29,6 +34,14 @@ angular.module('portfolio', ['dbResource', 'ngRoute', 'ngSanitize'])
     Project.getById($routeParams.id)
       .$promise.then(function (project) {
         $scope.project = project;
+      }
+    );
+  })
+
+  .controller('TagViewController', function ($scope, $routeParams, Tag) {
+    Tag.getByCode($routeParams.code)
+      .$promise.then(function (tag) {
+        $scope.tag = tag;
       }
     );
   })

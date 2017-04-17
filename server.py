@@ -4,11 +4,11 @@ from jinja2 import StrictUndefined
 from flask import (Flask, render_template, Response, request, redirect)
 from flask_debugtoolbar import DebugToolbarExtension
 from flask_uploads import UploadSet, IMAGES, configure_uploads
-
-from model import (Category, Project, Tag, Media, Thumbnail, ProjectMedia,
-                   CategoryProject, TagProject, db, connect_to_db,)
 import json
-from sqlalchemy.orm import exc
+
+from model import (Category, Project, Tag, Media, ProjectMedia,
+                   CategoryProject, TagProject, db, connect_to_db,
+                   DeleteHistory)
 
 
 app = Flask(__name__)
@@ -21,7 +21,12 @@ app.secret_key = 'ABC'
 # error.
 app.jinja_env.undefined = StrictUndefined
 
+# Configuration for uploading images
 app.config['UPLOADS_DEFAULT_DEST'] = 'static'
+images = UploadSet('images', IMAGES)
+configure_uploads(app, (images,))
+
+_history = DeleteHistory(1)
 
 
 @app.route('/')
@@ -129,6 +134,30 @@ def get_media_json(media_id=None):
     return jsonify_list(media.get_attributes())
 
 
+@app.route('/tags.json')
+def get_tags_json():
+    """Return JSON array of all Tag objects."""
+
+    tags = Tag.query.all()
+
+    return jsonify_list(Tag.get_json_from_list(tags))
+
+
+@app.route('/tag.json')
+def get_tag_json(tag_code=None):
+    """Return JSON for a Tag."""
+
+    if not tag_code:
+        tag_code = request.args.get('tagCode')
+
+    tag = Tag.query.options(
+        db.joinedload('projects')
+          .joinedload('main_img')
+    ).get(tag_code)
+
+    return jsonify_list(tag.get_attributes())
+
+
 @app.route('/admin/dashboard/')
 def show_dashboard():
     """Admin dashboard.
@@ -164,10 +193,9 @@ def update_category(category_id):
     """Delete or update a category from the database."""
 
     if request.method == 'DELETE':
-        db.session.delete(Category.query.get(category_id))
-        db.session.commit()
-
-        return get_categories_json(True)
+        _history.queue(Category.query.get(category_id))
+        # TODO: flash Undo message
+        return get_category_json(category_id)
 
     elif request.method == 'POST':
         data = json.loads(request.data.decode())
@@ -250,8 +278,10 @@ def update_project(project_id):
 def tag_project(project_id):
     """Attach a tag to project."""
 
+    # import pdb; pdb.set_trace()
+
     data = json.loads(request.data.decode())
-    tag_code = data.get('tagCode')
+    tag_code = data.get('code')
     project = Project.query.get(project_id)
     tag = Tag.query.get(tag_code)
 
@@ -288,10 +318,6 @@ def delete_project_tag(project_id, tag_code):
         db.session.commit()
 
     return get_project_json(project_id)
-
-
-images = UploadSet('images', IMAGES)
-configure_uploads(app, (images,))
 
 
 @app.route('/upload', methods=['POST'])
