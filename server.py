@@ -7,7 +7,7 @@ from flask_uploads import UploadSet, IMAGES, configure_uploads
 import json
 from model import (Category, Project, Tag, Media, ProjectMedia,
                    CategoryProject, TagProject, db, connect_to_db,
-                   DeleteHistory)
+                   )
 
 
 app = Flask(__name__)
@@ -24,8 +24,6 @@ app.jinja_env.undefined = StrictUndefined
 app.config['UPLOADS_DEFAULT_DEST'] = 'static'
 images = UploadSet('images', IMAGES)
 configure_uploads(app, (images,))
-
-_history = DeleteHistory(1)
 
 
 @app.route('/')
@@ -192,8 +190,9 @@ def update_category(category_id):
     """Delete or update a category from the database."""
 
     if request.method == 'DELETE':
-        _history.queue(Category.query.get(category_id))
-        # TODO: flash Undo message
+        db.session.delete(Category.query.get(category_id))
+        db.session.commit()
+
         return get_category_json(category_id)
 
     elif request.method == 'POST':
