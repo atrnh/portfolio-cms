@@ -235,11 +235,12 @@ def add_project():
     db.session.commit()
 
     # Add tags
-    all_tags = Tag.create_tags(tags)
-    db.session.add_all([TagProject(project.id, tag.code)
-                        for tag in all_tags
-                        ])
-    db.session.commit()
+    if tags:
+        all_tags = Tag.create_tags(tags)
+        db.session.add_all([TagProject(project.id, tag.code)
+                            for tag in all_tags
+                            ])
+        db.session.commit()
 
     return redirect('/admin/dashboard')
 
