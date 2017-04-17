@@ -5,7 +5,6 @@ from flask import (Flask, render_template, Response, request, redirect)
 from flask_debugtoolbar import DebugToolbarExtension
 from flask_uploads import UploadSet, IMAGES, configure_uploads
 import json
-
 from model import (Category, Project, Tag, Media, ProjectMedia,
                    CategoryProject, TagProject, db, connect_to_db,
                    DeleteHistory)

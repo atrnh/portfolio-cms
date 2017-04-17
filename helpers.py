@@ -1,5 +1,4 @@
-"""Helpers for use with model.py"""
-
+"""Helpers for use with model.py."""
 
 from datetime import datetime
 import json
@@ -82,3 +81,7 @@ class DeleteHistory(object):
         """Pop an object to undo."""
 
         return self._history.pop()
+
+
+if __name__ == '__main__':
+    from model import db
