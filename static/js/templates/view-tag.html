@@ -1,0 +1,14 @@
+<section id="tag-view">
+  <h2>Projects filed under: <i>~*~* tag.code *~*~</i></h2>
+
+  <div id="tagged-projects">
+    <ul ng-show="tag.projects">
+      <li ng-repeat="project in tag.projects">
+        <a ng-href="#/project/~*~* project.title *~*~/~*~* project.id*~*~">
+          ~*~* project.title *~*~
+        </a></br>
+        <img ng-src="/~*~* project.main_img.source_url *~*~" />
+      </li>
+    </ul>
+  </div>
+</section>

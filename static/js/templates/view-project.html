@@ -1,5 +1,13 @@
 <section id="project-view">
   <h2>~*~* project.title *~*~</h2>
+  <div>
+    <i>Filed under: </i>
+    <span ng-repeat="tag in project.tags">
+      <a ng-href="#/tag/~*~* tag.code *~*~">
+        ~*~* tag.code *~*~
+      </a>,
+    </span>
+  </div>
   <p ng-bind-html="project.desc"></p>
 
   <div>
