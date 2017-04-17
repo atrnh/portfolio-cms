@@ -6,10 +6,19 @@
   </span>
 </section>
 
-<span ng-show="showUndo">
-  Undo delete? <button ng-click="undoDelete()">Yes</button>
-  <button ng-click="commitDelete()">No</button>
-</span>
+<div uib-alert
+     ng-show="showUndo"
+     class="alert-warning"
+     close="commitDelete()">
+  <span>
+    ~*~* deletedName *~*~ deleted!
+    <b>
+      <a class="undo-link" ng-click="undoDelete()">
+        Undo?
+      </a>
+    </b>
+  </span>
+</div>
 
 <section ng-show="categories" id="projects-list">
   <ul ng-show="categories" id="categories">

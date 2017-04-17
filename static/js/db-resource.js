@@ -1,3 +1,4 @@
+/* jshint esversion: 6 */
 (function(angular) {
   'use strict';
 angular.module('dbResource', ['ngResource'])
@@ -43,17 +44,12 @@ angular.module('dbResource', ['ngResource'])
       },
 
       // Add a new project
-      addNew: function(title, desc, categoryId, tags) {
+      addNew: function(obj) {
         return $resource('/admin/project', {}, {
           'post': {
             method: 'POST'
           }
-        }).post({}, {
-          'title': title,
-          'desc': desc,
-          'categoryId': categoryId,
-          'tags': tags
-        });
+        }).post({}, obj);
       },
 
       // Delete a project

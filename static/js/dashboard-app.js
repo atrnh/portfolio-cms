@@ -86,6 +86,7 @@ angular.module('dashboard', [
         }
 
         $scope.showUndo = true;
+        $scope.deletedName = toDelete.title;
       };
 
       $scope.undoDelete = function () {
@@ -104,20 +105,56 @@ angular.module('dashboard', [
         } else if (undoType === 'project') {
           Project.delete(toDelete.id);
         }
+
+        $scope.showUndo = false;
       };
     }
   )
 
-  .controller('NewProjectController', function ($scope, $location, Category, Project) {
+  .controller('NewProjectController', function ($scope, $location, Category, Project, Tag) {
+    $scope.pendingTags = [];
+
     Category.getAll().$promise.then(function (categories) {
       $scope.categories = categories;
+      $scope.thisCategory = categories[0];
     });
 
-    $scope.addProject = function(title, desc, categoryId, rawTags) {
-      var re = /\s*,\s*/;
-      var tags = rawTags.split(re);
+    Tag.getAll().$promise.then(function (tags) {
+      $scope.tags = tags;
+    });
 
-      Project.addNew(title, desc, categoryId, tags)
+    $scope.handleTags = function(keyEvent) {
+      var key = keyEvent.key;
+
+      if (key === ',' || key === 'Enter') {
+        if (typeof $scope.newTag === 'string') {
+          $scope.newTag = {'code': $scope.newTag};
+        }
+
+        $scope.pendingTags.push($scope.newTag);
+        $scope.newTag = null;
+      }
+    };
+
+    $scope.deleteTag = function(tag) {
+      var idx = $scope.pendingTags.indexOf(tag);
+      if (idx >= 0) {
+        $scope.pendingTags.splice(idx, 1);
+      }
+    };
+
+    $scope.addProject = function(title, desc, category) {
+      var tagCodes = $scope.pendingTags.map(function (tag) {
+        return tag.code;
+      });
+      var obj = {
+        title: title,
+        desc: desc,
+        categoryId: category.id,
+        tags: tagCodes,
+      };
+
+      Project.addNew(obj)
         .$promise
         .then(function () {
           $location.path('/');

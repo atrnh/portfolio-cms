@@ -1,10 +1,29 @@
 <section>
   <h2>New project</h2>
   <input ng-model="title" type="text" placeholder="Title"></br>
-  <input ng-model="desc" type="text" placeholder="Description"></br>
-    <select ng-show="categories" ng-model="categoryId">
-        <option ng-repeat="category in categories" ng-value="category.id">~*~* category.title *~*~</option>
-    </select></br>
-  <input ng-model="rawTags" type="text" placeholder="comma-separated tags"></br>
-  <button ng-click="addProject(title, desc, categoryId, rawTags)">Submit</button>
+
+  <input ng-model="desc" type="textarea" placeholder="Description"></br>
+
+  <select ng-show="categories"
+          ng-model="thisCategory"
+          ng-options="category as category.title for category in categories">
+  </select></br>
+
+  <div id="tag-input">
+    <div id="tag-list" ng-show="pendingTags">
+      <button ng-repeat="tag in pendingTags"
+              ng-click="deleteTag(tag)">
+        x ~*~* tag.code *~*~
+      </button>
+    </div>
+    <input type="text"
+           placeholder="New Tags"
+           ng-model="newTag"
+           uib-typeahead="tag as tag.code for tag in tags |
+                          filter:$viewValue"
+           ng-keypress="handleTags($event)" />
+
+  </div>
+
+  <button ng-click="addProject(title, desc, thisCategory)">Submit</button>
 </section>
