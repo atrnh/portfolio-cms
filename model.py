@@ -3,10 +3,52 @@
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.sql import func
 from sqlalchemy.orm import exc
-from helpers import JSONMixin
+from datetime import datetime
+import json
 
 
 db = SQLAlchemy()
+
+
+class JSONMixin(object):
+    """JSON helper mixins."""
+
+    @staticmethod
+    def get_json_from_list(instances):
+        """Return JSON of a list of instances."""
+
+        return json.dumps(
+            [json.loads(instance.get_attributes()) for instance in instances]
+        )
+
+    def get_attributes(self):
+        """Get the attributes of an instance and their values.
+
+        Does not include private attributes.
+        """
+
+        attributes = {}
+
+        for attribute, value in self.__dict__.iteritems():
+            if not attribute.startswith('_'):
+                if type(value) is datetime:
+                    attributes[attribute] = value.isoformat()
+                elif isinstance(value, list):
+                    try:
+                        # We want a Python list instead of a JSON string since
+                        # it will already get converted to JSON in
+                        # return statement
+                        attributes[attribute] = json.loads(
+                            self.get_json_from_list(value)
+                        )
+                    except IndexError:
+                        attributes[attribute] = []
+                elif isinstance(value, db.Model):
+                    attributes[attribute] = json.loads(value.get_attributes())
+                else:
+                    attributes[attribute] = value
+
+        return json.dumps(attributes)
 
 
 class Admin(db.Model):
