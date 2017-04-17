@@ -40,6 +40,12 @@ angular.module('dashboard', [
   .controller(
     'ProjectsController',
     function ($scope, $location, Category, Project) {
+      var toDelete;
+      var undoIdx;
+      var undoType;
+      var projects;
+
+      $scope.showUndo = false;
 
       Category.getAll('true').$promise.then(function (categories) {
         $scope.categories = categories;
@@ -58,6 +64,46 @@ angular.module('dashboard', [
         Project.delete(id).$promise.then(function (categories) {
           $scope.categories = categories;
         });
+      };
+
+      $scope.queueDelete = function (type, obj, parent=null) {
+        undoType = type;
+
+        if (type === 'category') {
+          toDelete = obj;
+          undoIdx = $scope.categories.indexOf(obj);
+          if (undoIdx >= 0) {
+            $scope.categories.splice(idx, 1);
+          }
+        } else if (type === 'project') {
+          toDelete = obj;
+          var parentIdx = $scope.categories.indexOf(parent);
+          projects = $scope.categories[parentIdx].projects;
+          undoIdx = projects.indexOf(obj);
+          if (undoIdx >= 0) {
+            projects.splice(undoIdx, 1);
+          }
+        }
+
+        $scope.showUndo = true;
+      };
+
+      $scope.undoDelete = function () {
+        if (undoType === 'category') {
+          $scope.categories.splice(undoIdx, 0, toDelete);
+        } else if (undoType === 'project') {
+          projects.splice(undoIdx, 0, toDelete);
+        }
+
+        $scope.showUndo = false;
+      };
+
+      $scope.commitDelete = function () {
+        if (undoType === 'category') {
+          Category.delete(toDelete.id);
+        } else if (undoType === 'project') {
+          Project.delete(toDelete.id);
+        }
       };
     }
   )

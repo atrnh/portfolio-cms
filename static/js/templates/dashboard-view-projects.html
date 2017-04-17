@@ -6,6 +6,11 @@
   </span>
 </section>
 
+<span ng-show="showUndo">
+  Undo delete? <button ng-click="undoDelete()">Yes</button>
+  <button ng-click="commitDelete()">No</button>
+</span>
+
 <section ng-show="categories" id="projects-list">
   <ul ng-show="categories" id="categories">
     <li ng-repeat="category in categories"
@@ -14,7 +19,7 @@
         <a ng-href="#/edit/category/~*~* category.id *~*~">
           ~*~* category.title *~*~
         </a>
-        <button ng-if="category.projects.length === 0" ng-click="deleteCategory(category.id)">
+        <button ng-if="category.projects.length === 0" ng-click="queueDelete('category', category)">
           x
         </button>
       </span>
@@ -24,7 +29,7 @@
             <a ng-href="#/edit/project/~*~* project.id *~*~">
               ~*~* project.title *~*~
             </a>
-            <button ng-click="deleteProject(project.id)">
+            <button ng-click="queueDelete('project', project, category)">
               x
             </button>
           </span>
