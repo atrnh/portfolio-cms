@@ -124,7 +124,8 @@ class Project(db.Model, JSONMixin):
                                                         title=self.title,
                                                         )
 
-    def update(self, title=None, desc=None, category_id=None, tags=None, main_img_id=None):
+    def update(self, title=None, desc=None, category_id=None, tags=None,
+               main_img_id=None):
         """Update a project's fields."""
 
         if title:
@@ -330,10 +331,11 @@ class CategoryProject(db.Model):
         """Nice representation of a CategoryProject."""
 
         return ('<CategoryProject id={id} category_id={category_id} ' +
-                'project_id={project_id}>').format(id=self.id,
-                                                   category_id=self.category_id,
-                                                   project_id=self.project_id,
-                                                   )
+                'project_id={project_id}>').format(
+            id=self.id,
+            category_id=self.category_id,
+            project_id=self.project_id,
+        )
 
 
 class TagProject(db.Model):
@@ -377,16 +379,18 @@ def connect_to_db(app, db_uri='postgresql:///portfolio'):
 def example_data():
     """Create example data for testing."""
 
-    db.session.add_all([Category('Test',
-                                 'This is a test category.'
-                                 ),
-                        Category('Sculptures',
-                                 'Another test category of wonderful sculptures.'
-                                 ),
-                        Category('Photos',
-                                 'Test another category of cool photos.'
-                                 ),
-                        ])
+    db.session.add_all(
+        [Category('Test',
+                  'This is a test category.'
+                  ),
+         Category('Sculptures',
+                  'Another test category of wonderful sculptures.'
+                  ),
+         Category('Photos',
+                  'Test another category of cool photos.'
+                  ),
+         ]
+    )
 
     db.session.add_all([Project('Test Project',
                                 desc='This is a test project.'),
