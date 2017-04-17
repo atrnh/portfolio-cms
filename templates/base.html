@@ -18,7 +18,7 @@
       <ul>
         {% for category in categories %}
           <li>
-            <a href="#/{{ category.title }}/{{ category.id }}">
+            <a href="#/category/{{ category.title }}/{{ category.id }}">
               {{ category.title }}
             </a>
           </li>
@@ -26,7 +26,7 @@
             <ul>
               {% for project in category.projects %}
                 <li>
-                  <a href="#/{{ category.title }}/{{ category.id }}/{{ project.title }}/{{ project.id }}">
+                  <a href="#/project/{{ project.title }}/{{ project.id }}">
                     {{ project.title }}
                   </a>
                 </li>
