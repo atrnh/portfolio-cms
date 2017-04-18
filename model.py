@@ -59,9 +59,10 @@ class Admin(db.Model):
     email = db.Column(db.String(40), primary_key=True)
     first_name = db.Column(db.String(100))
     last_name = db.Column(db.String(100))
-    hashed_password = db.Column(db.Integer)
+    hashed_password = db.Column(db.BigInteger)
     is_active = db.Column(db.Boolean)
     is_anonymous = db.Column(db.Boolean)
+    is_authenticated = db.Column(db.Boolean)
 
     def __init__(self, email, first_name, last_name, hashed_password):
         """Instantiate an admin."""
@@ -72,6 +73,7 @@ class Admin(db.Model):
         self.hashed_password = hashed_password
         self.is_active = True
         self.is_anonymous = False
+        self.is_authenticated = True
 
     def __repr__(self):
         """Nice representation of Admin."""
@@ -79,8 +81,6 @@ class Admin(db.Model):
 
     def is_hashed_password(self, password):
         """Return true if stored password matches hash of given password."""
-
-        self.is_authenticated = True
 
         return self.hashed_password == hash(password)
 

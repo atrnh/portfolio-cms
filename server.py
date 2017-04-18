@@ -9,7 +9,7 @@ from model import (Category, Project, Tag, Media, ProjectMedia,
                    CategoryProject, TagProject, db, connect_to_db,
                    Admin,
                    )
-from flask_login import LoginManager, login_user
+from flask_login import LoginManager, login_user, login_required
 
 
 app = Flask(__name__)
@@ -30,6 +30,7 @@ configure_uploads(app, (images,))
 # Configuration for login handling
 login_manager = LoginManager()
 login_manager.init_app(app)
+login_manager.login_view = "login"
 
 
 @login_manager.user_loader
@@ -179,6 +180,7 @@ def login():
         admin = Admin.query.get(email)
 
         if admin.is_hashed_password(password):
+            admin.is_authenticated = True
             login_user(admin)
 
             return redirect('/admin/dashboard')
@@ -186,7 +188,23 @@ def login():
     return render_template('login.html')
 
 
+@app.route('/register', methods=['POST'])
+def register():
+    """Register a user."""
+
+    email = request.form.get('email')
+    first_name = request.form.get('first_name')
+    last_name = request.form.get('last_name')
+    password = request.form.get('password')
+
+    db.session.add(Admin(email, first_name, last_name, hash(password)))
+    db.session.commit()
+
+    return redirect('/admin/login')
+
+
 @app.route('/admin/dashboard/')
+@login_required
 def show_dashboard():
     """Admin dashboard.
 
@@ -221,10 +239,11 @@ def update_category(category_id):
     """Delete or update a category from the database."""
 
     if request.method == 'DELETE':
+        deleted = get_category_json(category_id)
         db.session.delete(Category.query.get(category_id))
         db.session.commit()
 
-        return get_category_json(category_id)
+        return deleted
 
     elif request.method == 'POST':
         data = json.loads(request.data.decode())

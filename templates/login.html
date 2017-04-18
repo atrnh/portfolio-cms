@@ -12,5 +12,11 @@
   </form>
 
   <!-- TODO: Add registration modal -->
-  <a href="register">Register</a>
+  <form method="POST" action="/register">
+    <input type="text" name="email" placeholder="Email" />
+    <input type="text" name="first_name" placeholder="First Name" />
+    <input type="text" name="last_name" placeholder="Last Name" />
+    <input type="password" name="password" placeholder="Password" />
+    <input type="submit" />
+  </form>
 </body>

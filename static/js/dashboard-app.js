@@ -65,7 +65,7 @@ angular.module('dashboard', [
           toDelete = obj;
           undoIdx = $scope.categories.indexOf(obj);
           if (undoIdx >= 0) {
-            $scope.categories.splice(idx, 1);
+            $scope.categories.splice(undoIdx, 1);
           }
         } else if (type === 'project') {
           toDelete = obj;
