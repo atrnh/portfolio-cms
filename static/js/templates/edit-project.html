@@ -41,23 +41,27 @@
   <button ng-click="upload(imageFile)">Upload</button></br>
 
   <section id="edit-media">
-    <ul>
-      <li ng-repeat="media in project.media">
-        <!-- Set main image -->
-        <input type="radio"
-               ng-model="project.main_img_id"
-               ng-value="media.id"
-               ng-change="update('mainImgId', project.main_img_id)"
-               />
-        <span ng-switch="project.main_img_id === media.id">
-          <span ng-switch-when="true">Current main image.</span>
-          <span ng-switch-default>Set main image.</span>
-        </span>
-        <edit-media media="media"
-                    on-update="updateMedia(media, prop, value)"
-                    on-delete="deleteMedia(media)">
-        </edit-media>
-      </li>
-    </ul>
+    <p>
+      Current main image: ~*~* project.main_img_id *~*~
+    </p>
+    <uib-accordion close-others="true">
+      <span ng-repeat="media in project.media">
+        <div uib-accordion-group class="panel-default" is-open="media.open">
+          <uib-accordion-heading>
+            ~*~* media.title *~*~ <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': media.open, 'glyphicon-chevron-right': !media.open}"></i>
+          </uib-accordion-heading>
+          <input type="radio"
+                 ng-model="project.main_img_id"
+                 ng-value="media.id"
+                 ng-change="update('mainImgId', project.main_img_id)"
+                 /> Main Image </br>
+          <edit-media media="media"
+                      on-update="updateMedia(media, prop, value)"
+                      on-delete="deleteMedia(media)">
+          </edit-media>
+        </div>
+      </span>
+
+    </uib-accordion>
   </section>
 </section>

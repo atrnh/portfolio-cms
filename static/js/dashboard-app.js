@@ -1,6 +1,13 @@
 (function(angular) {
   'use strict';
 
+var removeItem = function(item, collection) {
+  var idx = collection.indexOf(item);
+  if (idx >= 0) {
+    collection.splice(idx, 1);
+  }
+};
+
 angular.module('dashboard', [
   'ngRoute',
   'dbResource',
@@ -50,21 +57,6 @@ angular.module('dashboard', [
       Category.getAll('true').$promise.then(function (categories) {
         $scope.categories = categories;
       });
-
-      $scope.deleteCategory = function (id) {
-        Category.delete(id).$promise.then(function (category) {
-          var idx = $scope.categories.indexOf(category);
-          if (idx >= 0) {
-            $scope.categories.splice(idx, 1);
-          }
-        });
-      };
-
-      $scope.deleteProject = function (id) {
-        Project.delete(id).$promise.then(function (categories) {
-          $scope.categories = categories;
-        });
-      };
 
       $scope.queueDelete = function (type, obj, parent=null) {
         undoType = type;
@@ -137,10 +129,7 @@ angular.module('dashboard', [
     };
 
     $scope.deleteTag = function(tag) {
-      var idx = $scope.pendingTags.indexOf(tag);
-      if (idx >= 0) {
-        $scope.pendingTags.splice(idx, 1);
-      }
+      removeItem(tag, $scope.pendingTags);
     };
 
     $scope.addProject = function(title, desc, category) {
@@ -173,6 +162,10 @@ angular.module('dashboard', [
 
     Project.getById($scope.id).$promise.then(function (project) {
       $scope.project = project;
+      $scope.project.media = project.media.map(function (m) {
+        m.open = false;
+        return m;
+      });
 
       Category.getAll().$promise.then(function (categories) {
         $scope.categories = categories;
@@ -198,20 +191,17 @@ angular.module('dashboard', [
         if (typeof $scope.newTag === 'string') {
           $scope.newTag = {'code': $scope.newTag};
         }
-          $scope.project.tags.push($scope.newTag);
-          Project.newTag($scope.id, $scope.newTag)
-            .$promise.then(function (tag) {
-              $scope.newTag = null;
-          });
+        $scope.project.tags.push($scope.newTag);
+        Project.newTag($scope.id, $scope.newTag)
+          .$promise.then(function (tag) {
+            $scope.newTag = null;
+        });
       }
     };
 
     $scope.deleteTag = function(tag) {
       Project.deleteTag($scope.id, tag.code).$promise.then(function (project) {
-        var idx = $scope.project.tags.indexOf(tag);
-        if (idx >= 0) {
-          $scope.project.tags.splice(idx, 1);
-        }
+        removeItem(tag, $scope.project.tags);
       });
     };
 
@@ -235,10 +225,7 @@ angular.module('dashboard', [
 
     $scope.deleteMedia = function(media) {
       Media.delete($scope.id, media.id).$promise.then(function (resp) {
-        var idx = $scope.project.media.indexOf(media);
-        if (idx >= 0) {
-          $scope.project.media.splice(idx, 1);
-        }
+        removeItem(media, $scope.project.media);
       });
     };
   })
