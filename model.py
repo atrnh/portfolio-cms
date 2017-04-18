@@ -56,27 +56,38 @@ class Admin(db.Model):
 
     __tablename__ = 'admins'
 
-    username = db.Column(db.String(40), primary_key=True)
+    email = db.Column(db.String(40), primary_key=True)
     first_name = db.Column(db.String(100))
     last_name = db.Column(db.String(100))
     hashed_password = db.Column(db.Integer)
+    is_active = db.Column(db.Boolean)
+    is_anonymous = db.Column(db.Boolean)
 
-    def __init__(self, username, first_name, last_name, hashed_password):
+    def __init__(self, email, first_name, last_name, hashed_password):
         """Instantiate an admin."""
 
-        self.username = username
+        self.email = email
         self.first_name = first_name
         self.last_name = last_name
         self.hashed_password = hashed_password
+        self.is_active = True
+        self.is_anonymous = False
 
     def __repr__(self):
         """Nice representation of Admin."""
-        return '<Admin username={}'.format(self.username)
+        return '<Admin email={}'.format(self.email)
 
     def is_hashed_password(self, password):
         """Return true if stored password matches hash of given password."""
 
+        self.is_authenticated = True
+
         return self.hashed_password == hash(password)
+
+    def get_id(self):
+        """Return unicode username."""
+
+        return unicode(self.email)
 
 
 class Config(db.Model):
@@ -307,6 +318,52 @@ class Media(db.Model, JSONMixin):
         return '<Media id={id} title={title}>'.format(id=self.id,
                                                       title=self.title,
                                                       )
+
+
+class Page(db.Model, JSONMixin):
+    """A page with html content."""
+
+    __tablename__ = 'pages'
+
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    title = db.Column(db.String(100))
+    content = db.Column(db.Text, nullable=True)
+
+    def __init__(self, title, content=None):
+        """Instantiate a Page."""
+
+        self.title = title
+        self.content = content
+
+    def __repr__(self):
+        """Nice represenation of a Page."""
+
+        return '<Page id={id} title={title}>'.format(id=self.id,
+                                                     title=self.title,
+                                                     )
+
+
+class ExternalLink(db.Model, JSONMixin):
+    """An external link."""
+
+    __tablename__ = 'external_links'
+
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    title = db.Column(db.String(100))
+    url = db.Column(db.String(140))
+
+    def __init__(self, title, url):
+        """Instantiate an ExternalLink."""
+
+        self.title = title
+        self.url = url
+
+    def __repr__(self):
+        """Nice representation of an ExternalLink."""
+
+        return '<ExternalLink id={id} title={title}'.format(id=self.id,
+                                                            title=self.title,
+                                                            )
 
 
 class Thumbnail(db.Model):
