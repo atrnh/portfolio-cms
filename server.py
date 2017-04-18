@@ -7,7 +7,9 @@ from flask_uploads import UploadSet, IMAGES, configure_uploads
 import json
 from model import (Category, Project, Tag, Media, ProjectMedia,
                    CategoryProject, TagProject, db, connect_to_db,
+                   Admin,
                    )
+from flask_login import LoginManager, login_user
 
 
 app = Flask(__name__)
@@ -24,6 +26,17 @@ app.jinja_env.undefined = StrictUndefined
 app.config['UPLOADS_DEFAULT_DEST'] = 'static'
 images = UploadSet('images', IMAGES)
 configure_uploads(app, (images,))
+
+# Configuration for login handling
+login_manager = LoginManager()
+login_manager.init_app(app)
+
+
+@login_manager.user_loader
+def load_user(email):
+    """Requirement for flask_login."""
+
+    return Admin.query.get(email)
 
 
 @app.route('/')
@@ -153,6 +166,24 @@ def get_tag_json(tag_code=None):
     ).get(tag_code)
 
     return jsonify_list(tag.get_attributes())
+
+
+@app.route('/admin/login', methods=['GET', 'POST'])
+def login():
+    """Display log in form and handle logging in user."""
+
+    if request.method == 'POST':
+        email = request.form.get('email')
+        password = request.form.get('password')
+
+        admin = Admin.query.get(email)
+
+        if admin.is_hashed_password(password):
+            login_user(admin)
+
+            return redirect('/admin/dashboard')
+
+    return render_template('login.html')
 
 
 @app.route('/admin/dashboard/')
