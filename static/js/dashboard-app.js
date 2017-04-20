@@ -1,3 +1,4 @@
+/* jshint esversion: 6 */
 (function(angular) {
   'use strict';
 
@@ -10,14 +11,29 @@ var removeItem = function(item, collection) {
 
 angular.module('dashboard', [
   'ngRoute',
-  'dbResource',
+  'dbService',
   'ngFileUpload',
   'ngSanitize',
   'ui.bootstrap',
 ])
-  .config(function ($interpolateProvider, $routeProvider) {
+  .config(['$routeProvider', function ($routeProvider) {
 
-    $routeProvider
+    var universalResolves = {
+      'CategoriesData': function(Categories) {
+        return Categories.promise;
+      },
+    };
+
+    var customRouteProvider = angular.extend({}, $routeProvider, {
+      when: function(path, route) {
+        route.resolve = (route.resolve) ? route.resolve : {};
+        angular.extend(route.resolve, universalResolves);
+        $routeProvider.when(path, route);
+        return this;
+      }
+    });
+
+    customRouteProvider
       .when('/', {
         templateUrl: '/static/js/templates/dashboard-view-projects.html',
         controller: 'ProjectsController'
@@ -42,11 +58,11 @@ angular.module('dashboard', [
         templateUrl: '/static/js/templates/edit-project.html'
       })
       ;
-  })
+  }])
 
   .controller(
     'ProjectsController',
-    function ($scope, $location, Category, Project) {
+    function ($scope, $route, Categories, Project) {
       var toDelete;
       var undoIdx;
       var undoType;
@@ -54,19 +70,13 @@ angular.module('dashboard', [
 
       $scope.showUndo = false;
 
-      Category.getAll('true').$promise.then(function (categories) {
-        $scope.categories = categories;
-      });
+      $scope.categories = Categories.all();
 
       $scope.queueDelete = function (type, obj, parent=null) {
         undoType = type;
 
         if (type === 'category') {
-          toDelete = obj;
-          undoIdx = $scope.categories.indexOf(obj);
-          if (undoIdx >= 0) {
-            $scope.categories.splice(undoIdx, 1);
-          }
+          $scope.deletedName = Categories.queueDelete(obj).title;
         } else if (type === 'project') {
           toDelete = obj;
           var parentIdx = $scope.categories.indexOf(parent);
@@ -78,12 +88,11 @@ angular.module('dashboard', [
         }
 
         $scope.showUndo = true;
-        $scope.deletedName = toDelete.title;
       };
 
       $scope.undoDelete = function () {
         if (undoType === 'category') {
-          $scope.categories.splice(undoIdx, 0, toDelete);
+          Categories.undoDelete();
         } else if (undoType === 'project') {
           projects.splice(undoIdx, 0, toDelete);
         }
@@ -93,7 +102,7 @@ angular.module('dashboard', [
 
       $scope.commitDelete = function () {
         if (undoType === 'category') {
-          Category.delete(toDelete.id);
+          Categories.commitDelete();
         } else if (undoType === 'project') {
           Project.delete(toDelete.id);
         }
@@ -103,15 +112,13 @@ angular.module('dashboard', [
     }
   )
 
-  .controller('NewProjectController', function ($scope, $location, Category, Project, Tag) {
+  .controller('NewProjectController', function ($scope, $location, Category, Project, Tag, Categories, Tags) {
     $scope.pendingTags = [];
 
-    Category.getAll().$promise.then(function (categories) {
-      $scope.categories = categories;
-      $scope.thisCategory = categories[0];
-    });
+    $scope.categories = Categories.all();
+    $scope.thisCategory = $scope.categories[0];
 
-    Tag.getAll().$promise.then(function (tags) {
+    $scope.tags = Tag.getAll().$promise.then(function (tags) {
       $scope.tags = tags;
     });
 
@@ -145,18 +152,20 @@ angular.module('dashboard', [
 
       Project.addNew(obj)
         .$promise
-        .then(function () {
+        .then(function (project) {
+          Categories.addProjectTo(category, project);
           $location.path('/');
         })
       ;
     };
   })
 
-  .controller('EditProjectController', function ($scope, $location, $routeParams, Project, Category, Upload, Media, Tag) {
+  .controller('EditProjectController', function ($scope, $location, $routeParams, Project, Category, Upload, Media, Tag, Categories) {
 
     $scope.id = $routeParams.projectId;
+    var categoryCopy;
 
-    Tag.getAll().$promise.then(function (tags) {
+    $scope.tags = Tag.getAll().$promise.then(function (tags) {
       $scope.tags = tags;
     });
 
@@ -167,13 +176,9 @@ angular.module('dashboard', [
         return m;
       });
 
-      Category.getAll().$promise.then(function (categories) {
-        $scope.categories = categories;
-        var idx = categories.findIndex(function (category) {
-          return category.id === project.categories[0].id;
-        });
-        $scope.thisCategory = $scope.categories[idx];
-      });
+      $scope.categories = Categories.all();
+      $scope.thisCategory = Categories.get(project.categories[0].id);
+      categoryCopy = $scope.thisCategory;
     });
 
     $scope.update = function(prop, value) {
@@ -181,6 +186,10 @@ angular.module('dashboard', [
       obj[prop] = value;
       Project.update($scope.id, obj)
         .$promise.then(function (resp) {
+          if (prop === 'categoryId') {
+            Categories.addProjectTo($scope.thisCategory, $scope.project);
+            Categories.removeProjectFrom(categoryCopy, $scope.project);
+          }
           $scope.project[prop] = value;
         });
     };
@@ -230,22 +239,23 @@ angular.module('dashboard', [
     };
   })
 
-  .controller('NewCategoryController', function ($scope, Category, $location) {
+  .controller('NewCategoryController', function ($scope, Category, $location, Categories) {
     $scope.addCategory = function (title, desc) {
-      Category.addNew(title, desc).$promise.then(function (categories) {
+      Category.addNew(title, desc).$promise.then(function (category) {
+        Categories.push(category);
         $location.path('/');
       });
     };
   })
 
-  .controller('EditCategoryController', function ($scope, $routeParams, Category) {
-    $scope.id = $routeParams.categoryId;
-    $scope.category = Category.getById($scope.id);
+  .controller('EditCategoryController', function ($scope, $routeParams, Category, Categories) {
+    var id = parseInt($routeParams.categoryId, 10);
+    $scope.category = Categories.get(id);
 
     $scope.update = function (prop, value) {
       var obj = {};
       obj[prop] = value;
-      Category.update($scope.id, obj).$promise.then(function (category) {
+      Category.update(id, obj).$promise.then(function (category) {
         $scope.category[prop] = value;
       });
     };

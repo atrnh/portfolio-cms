@@ -6,6 +6,7 @@
 
   dbService.service('Tags', ['Tag', function (Tag) {
     var all;
+    var addQueue = [];
 
     var promise = Tag.getAll().$promise.then(function (tags) {
       all = tags;
@@ -16,6 +17,14 @@
 
       all: function() {
         return all;
+      },
+
+      enqueueAdd: function(tag) {
+        addQueue.push(tag);
+      },
+
+      commitAdd: function(arr) {
+        all = all.concat(addQueue);
       }
     };
   }]);
