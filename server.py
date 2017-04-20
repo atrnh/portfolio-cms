@@ -231,7 +231,7 @@ def add_category():
     db.session.add(category)
     db.session.commit()
 
-    return get_categories_json(True)
+    return get_category_json(category.id)
 
 
 @app.route('/admin/category/<category_id>', methods=['DELETE', 'POST'])
@@ -292,7 +292,7 @@ def add_project():
                             ])
         db.session.commit()
 
-    return redirect('/admin/dashboard')
+    return get_project_json(project.id)
 
 
 @app.route('/admin/project/<project_id>', methods=['DELETE', 'POST'])
