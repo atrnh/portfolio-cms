@@ -4,6 +4,11 @@ angular.module('portfolio', ['dbResource', 'ngRoute', 'ngSanitize'])
 
   .config(function ($routeProvider) {
     $routeProvider
+      .when('/', {
+        templateUrl: '/static/js/templates/view-portfolio-main.html',
+        controller: 'MainViewController'
+      })
+
       .when('/category/:categoryTitle/:id', {
         templateUrl: '/static/js/templates/view-category.html',
         controller: 'CategoryViewController'
@@ -44,6 +49,12 @@ angular.module('portfolio', ['dbResource', 'ngRoute', 'ngSanitize'])
         $scope.tag = tag;
       }
     );
+  })
+
+  .controller('MainViewController', function ($scope, Media) {
+    Media.getAll().$promise.then(function (media) {
+      $scope.recentMedia = media;
+    });
   })
 ;
 })(window.angular);

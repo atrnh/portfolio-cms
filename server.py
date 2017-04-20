@@ -145,6 +145,17 @@ def get_media_json(media_id=None):
     return jsonify_list(media.get_attributes())
 
 
+@app.route('/all_media.json')
+def get_all_media_json():
+    """Return JSON of all media, ordered by date updated."""
+
+    all_media = Media.query.options(
+        db.joinedload('projects')
+    ).order_by(Media.date_updated).all()
+
+    return jsonify_list(Media.get_json_from_list(all_media))
+
+
 @app.route('/tags.json')
 def get_tags_json():
     """Return JSON array of all Tag objects."""
@@ -377,7 +388,7 @@ def upload():
 
     project_id = request.form.get('projectId')
 
-    media = Media('test', images.path(filename))
+    media = Media('Untitled', images.path(filename))
     db.session.add(media)
     db.session.commit()
 
@@ -388,7 +399,8 @@ def upload():
     return get_media_json(media.id)
 
 
-@app.route('/admin/project/<project_id>/media/<media_id>', methods=['POST', 'DELETE'])
+@app.route('/admin/project/<project_id>/media/<media_id>',
+           methods=['POST', 'DELETE'])
 def update_media(project_id, media_id):
     """Update or delete media."""
 
