@@ -2,9 +2,6 @@
 (function(angular) {
   'use strict';
 
-// TODO: Create a base object so all database objects can inherit from it
-// Need parameters for plural json url and single json url
-
 angular.module('dbResource', ['ngResource'])
 
   .config(function ($interpolateProvider, $locationProvider) {
@@ -127,8 +124,7 @@ angular.module('dbResource', ['ngResource'])
       addNew: function(title, desc) {
         return $resource('/admin/category', {}, {
           'post': {
-            method: 'POST',
-            isArray: true,
+            method: 'POST'
           }
         }).post({}, {'title': title, 'desc': desc});
       },
