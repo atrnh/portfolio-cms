@@ -178,6 +178,15 @@ angular.module('dbResource', ['ngResource'])
           }
         }).get();
       },
+
+      getAll: function() {
+        return $resource('/all_media.json', {}, {
+          'get': {
+            method: 'GET',
+            isArray: true
+          }
+        }).get();
+      }
     };
   })
 
