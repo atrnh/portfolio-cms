@@ -30,7 +30,7 @@
         <a ng-href="#/edit/category/~*~* category.id *~*~">
           ~*~* category.title *~*~
         </a>
-        <button ng-if="category.projects.length === 0" ng-click="queueDelete('category', category)">
+        <button ng-if="category.projects.length === 0 || !category.hasOwnProperty('projects')" ng-click="queueDelete('category', category)">
           x
         </button>
       </span>
