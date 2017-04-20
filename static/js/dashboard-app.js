@@ -127,6 +127,7 @@ angular.module('dashboard', [
 
       if (key === ',' || key === 'Enter') {
         if (typeof $scope.newTag === 'string') {
+          $scope.newTag = $scope.newTag.replace(' ', '-');
           $scope.newTag = {'code': $scope.newTag};
         }
 
@@ -198,6 +199,7 @@ angular.module('dashboard', [
       var key = keyEvent.key;
       if (key === ',' || key === 'Enter') {
         if (typeof $scope.newTag === 'string') {
+          $scope.newTag = $scope.newTag.replace(' ', '-');
           $scope.newTag = {'code': $scope.newTag};
         }
         $scope.project.tags.push($scope.newTag);
