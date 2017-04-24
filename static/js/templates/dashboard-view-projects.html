@@ -22,30 +22,65 @@
   </span>
 </div>
 
-<section ng-show="categories" id="projects-list">
-  <ul ng-show="categories" id="categories">
-    <li ng-repeat="category in categories"
-        class="category">
-      <span>
-        <a ng-href="#/edit/category/~*~* category.id *~*~">
-          ~*~* category.title *~*~
-        </a>
-        <button ng-if="category.projects.length === 0 || !category.hasOwnProperty('projects')" ng-click="queueDelete('category', category)">
-          x
-        </button>
-      </span>
-      <ul ng-show="category.projects">
-        <li ng-repeat="project in category.projects">
+<uib-accordion ng-init="accordion.isCategoriesOpen = true" close-others="false">
+  <section uib-accordion-group class="panel-default" is-open="accordion.isCategoriesOpen">
+    <uib-accordion-heading>
+      Categories &amp; Projects <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': accordion.isCategoriesOpen, 'glyphicon-chevron-right': !accordion.isCategoriesOpen}"></i>
+    </uib-accordion-heading>
+    <div ng-show="categories" id="projects-list">
+      <ul ng-show="categories" id="categories">
+        <li ng-repeat="(id, category) in categories"
+            class="category">
           <span>
-            <a ng-href="#/edit/project/~*~* project.id *~*~">
-              ~*~* project.title *~*~
+            <a ng-href="#/edit/category/~*~* category.id *~*~">
+              ~*~* category.title *~*~
             </a>
-            <button ng-click="queueDelete('project', project, category)">
+            <button ng-if="category.projects | isEmpty" ng-click="queueDelete('category', category)">
               x
             </button>
           </span>
+          <ul ng-show="category.projects">
+            <li ng-repeat="project in category.projects">
+              <span>
+                <a ng-href="#/edit/project/~*~* project.id *~*~">
+                  ~*~* project.title *~*~
+                </a>
+                <button ng-click="queueDelete('project', project, category)">
+                  x
+                </button>
+              </span>
+            </li>
+          </ul>
         </li>
       </ul>
-    </li>
-  </ul>
-</section>
+    </div>
+  </section>
+  <section uib-accordion-group class="panel-default" is-open="accordion.isPagesOpen">
+    <uib-accordion-heading>
+      Pages <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': accordion.isPagesOpen, 'glyphicon-chevron-right': !accordion.isPagesOpen}"></i>
+    </uib-accordion-heading>
+    <div ng-show="pages">
+      <ul>
+        <li ng-repeat="page in pages">
+          <a ng-href="#/edit/page/~*~* page.id *~*~">
+            ~*~* page.title *~*~
+          </a>
+        </li>
+      </ul>
+    </div>
+  </section>
+  <section uib-accordion-group class="panel-default" is-open="accordion.isLinksOpen">
+    <uib-accordion-heading>
+      Links <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': accordion.isLinksOpen, 'glyphicon-chevron-right': !accordion.isLinksOpen}"></i>
+    </uib-accordion-heading>
+    <div ng-show="links">
+      <ul>
+        <li ng-repeat="link in links">
+          <a ng-href="#/edit/link/~*~* link.id *~*~">
+            ~*~* link.title *~*~
+          </a>
+        </li>
+      </ul>
+    </div>
+  </section>
+</uib-accordion>
