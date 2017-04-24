@@ -1,0 +1,17 @@
+<div class="nav-panel-heading">
+  <span class="nav-expand">
+    <i class="glyphicon"
+       ng-class="{'glyphicon-minus': isOpen, 'glyphicon-plus': !isOpen}"
+       ng-click="toggleOpen()"
+       tabindex="0">
+    </i>
+  </span>
+  <span class="nav-header" uib-accordion-transclude="heading">
+    <span uib-accordion-header>
+      ~*~* heading *~*~
+    </span>
+  </span>
+</div>
+<div class="panel-collapse collapse" uib-collapse="!isOpen">
+  <div class="nav-panel-body" ng-transclude></div>
+</div>
