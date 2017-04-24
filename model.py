@@ -3,6 +3,7 @@
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.sql import func
 from sqlalchemy.orm import exc
+from sqlalchemy.inspection import inspect
 from datetime import datetime
 import json
 
@@ -14,14 +15,23 @@ class JSONMixin(object):
     """JSON helper mixins."""
 
     @staticmethod
-    def get_json_from_list(instances):
+    def get_json_from_list(instances, make_list=False):
         """Return JSON of a list of instances."""
 
-        return json.dumps(
-            [json.loads(instance.get_attributes()) for instance in instances]
-        )
+        if not make_list:
+            return json.dumps(
+                {inspect(instance).identity[0]:
+                 json.loads(instance.get_attributes())
+                 for instance in instances}
+            )
 
-    def get_attributes(self):
+        else:
+            return json.dumps(
+                [json.loads(instance.get_attributes())
+                 for instance in instances]
+            )
+
+    def get_attributes(self, get_projects_object=True):
         """Get the attributes of an instance and their values.
 
         Does not include private attributes.
@@ -38,9 +48,19 @@ class JSONMixin(object):
                         # We want a Python list instead of a JSON string since
                         # it will already get converted to JSON in
                         # return statement
-                        attributes[attribute] = json.loads(
-                            self.get_json_from_list(value)
-                        )
+                        if not isinstance(value[0], Project):
+                            attributes[attribute] = json.loads(
+                                self.get_json_from_list(value, True)
+                            )
+                        else:
+                            if get_projects_object:
+                                attributes[attribute] = json.loads(
+                                    self.get_json_from_list(value)
+                                )
+                            else:
+                                attributes[attribute] = json.loads(
+                                    self.get_json_from_list(value, True)
+                                )
                     except IndexError:
                         attributes[attribute] = []
                 elif isinstance(value, db.Model):
@@ -135,6 +155,27 @@ class Category(db.Model, JSONMixin):
         return '<Category id={id} title={title}>'.format(id=self.id,
                                                          title=self.title,
                                                          )
+
+    @classmethod
+    def load_with_projects_media(cls):
+        """Return categories with nested projects and media."""
+
+        categories = cls.query.options(
+            db.joinedload('projects')
+              .joinedload('media')
+        ).order_by(Category.id).all()
+
+        return categories
+
+    @classmethod
+    def load_with_projects(cls):
+        """Return categories with nested projects."""
+
+        categories = cls.query.options(
+            db.joinedload('projects')
+        ).order_by(Category.id).all()
+
+        return categories
 
 
 class Project(db.Model, JSONMixin):

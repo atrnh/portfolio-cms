@@ -7,7 +7,7 @@ from flask_uploads import UploadSet, IMAGES, configure_uploads
 import json
 from model import (Category, Project, Tag, Media, ProjectMedia,
                    CategoryProject, TagProject, db, connect_to_db,
-                   Admin,
+                   Admin, Page, ExternalLink
                    )
 from flask_login import LoginManager, login_user, login_required
 
@@ -56,7 +56,7 @@ def view_portfolio():
 
 @app.route('/categories.json')
 def get_categories_json(load_all=False):
-    """Return JSON list of all categories in database.
+    """Return JSON object of all categories in database.
 
     If loadAll is present, greedily load all nested objects.
     """
@@ -65,16 +65,26 @@ def get_categories_json(load_all=False):
         load_all = request.args.get('loadAll')
 
     if load_all:
-        categories = Category.query.options(db.joinedload('projects')
-                                              .joinedload('media')
-                                            ).order_by(Category.id
-                                                       ).all()
+        categories = Category.load_with_projects_media()
     else:
-        categories = Category.query.options(db.joinedload('projects')
-                                            ).order_by(Category.id
-                                                       ).all()
+        categories = Category.load_with_projects()
 
     return jsonify_list(Category.get_json_from_list(categories))
+
+
+@app.route('/categories_list.json')
+def get_categories_list_json(load_all=False):
+    """Return JSON list of all categories in database."""
+
+    if not load_all:
+        load_all = request.args.get('loadAll')
+
+    if load_all:
+        categories = Category.load_with_projects_media()
+    else:
+        categories = Category.load_with_projects()
+
+    return jsonify_list(Category.get_json_from_list(categories, True))
 
 
 @app.route('/category.json')
@@ -94,7 +104,7 @@ def get_category_json(category_id=None):
 
 @app.route('/projects.json')
 def get_category_projects_json():
-    """Return JSON list of all projects.
+    """Return JSON object of all projects.
 
     If categoryId is given in the request, return list of only projects
     associated with that category. If not, return list of all projects.
@@ -151,7 +161,7 @@ def get_all_media_json():
 
     all_media = Media.query.options(
         db.joinedload('projects')
-    ).order_by(Media.date_updated).all()
+    ).order_by(Media.date_updated).limit(6).all()
 
     return jsonify_list(Media.get_json_from_list(all_media))
 
@@ -162,7 +172,7 @@ def get_tags_json():
 
     tags = Tag.query.all()
 
-    return jsonify_list(Tag.get_json_from_list(tags))
+    return jsonify_list(Tag.get_json_from_list(tags, True))
 
 
 @app.route('/tag.json')
@@ -177,7 +187,51 @@ def get_tag_json(tag_code=None):
           .joinedload('main_img')
     ).get(tag_code)
 
-    return jsonify_list(tag.get_attributes())
+    return jsonify_list(
+        tag.get_attributes(get_projects_object=False)
+    )
+
+
+@app.route('/pages.json')
+def get_pages_json():
+    """Return JSON of all pages."""
+
+    pages = Page.query.all()
+
+    return jsonify_list(Page.get_json_from_list(pages, True))
+
+
+@app.route('/page.json')
+def get_page_json(page_id=None):
+    """Return JSON for a Page."""
+
+    if not page_id:
+        page_id = request.args.get('pageId')
+
+    page = Page.query.get(page_id)
+
+    return jsonify_list(page.get_attributes())
+
+
+@app.route('/links.json')
+def get_links_json():
+    """Return JSON list of all links."""
+
+    links = ExternalLink.query.all()
+
+    return jsonify_list(ExternalLink.get_json_from_list(links, True))
+
+
+@app.route('/link.json')
+def get_link_json(link_id=None):
+    """Return JSON for an ExternalLink."""
+
+    if not link_id:
+        link_id = request.args.get('linkId')
+
+    link = ExternalLink.query.get(link_id)
+
+    return jsonify_list(link.get_attributes())
 
 
 @app.route('/admin/login', methods=['GET', 'POST'])
@@ -338,8 +392,6 @@ def update_project(project_id):
 def tag_project(project_id):
     """Attach a tag to project."""
 
-    # import pdb; pdb.set_trace()
-
     data = json.loads(request.data.decode())
     tag_code = data.get('code')
     project = Project.query.get(project_id)
@@ -432,6 +484,97 @@ def update_media(project_id, media_id):
         db.session.commit()
 
         return get_project_json(project_id)
+
+
+@app.route('/admin/page', methods=['POST'])
+def add_page():
+    """Add a Page."""
+
+    data = json.loads(request.data.decode())
+
+    title = data.get('title')
+    content = data.get('content')
+    page = Page(title, content)
+
+    db.session.add(page)
+    db.session.commit()
+
+    return get_page_json(page.id)
+
+
+@app.route('/admin/page/<page_id>', methods=['DELETE', 'POST'])
+def update_page(page_id):
+    """Delete a Page."""
+
+    page = Page.query.get(page_id)
+
+    if request.method == 'POST':
+        data = json.loads(request.data.decode())
+        print data
+
+        title = data.get('title')
+        content = data.get('content')
+
+        if title:
+            page.title = title
+            db.session.commit()
+        if content is not None:
+            page.content = content
+            db.session.commit()
+
+        return jsonify_list(page.get_attributes())
+    else:
+        page_json = get_page_json(page_id)
+
+        db.session.delete(page)
+        db.session.commit()
+
+        return page_json
+
+
+@app.route('/admin/link', methods=['POST'])
+def add_link():
+    """Add an ExternalLink."""
+
+    data = json.loads(request.data.decode())
+
+    title = data.get('title')
+    url = data.get('url')
+    link = ExternalLink(title, url)
+
+    db.session.add(link)
+    db.session.commit()
+
+    return get_link_json(link.id)
+
+
+@app.route('/admin/link/<link_id>', methods=['DELETE', 'POST'])
+def update_link(link_id):
+    """Delete or update an ExternalLink."""
+
+    link = ExternalLink.query.get(link_id)
+
+    if request.method == 'POST':
+        data = json.loads(request.data.decode())
+
+        title = data.get('title')
+        url = data.get('url')
+
+        if title:
+            link.title = title
+            db.session.commit()
+        if url is not None:
+            link.url = url
+            db.session.commit()
+
+        return jsonify_list(link.get_attributes())
+    else:
+        link_json = get_link_json(link_id)
+
+        db.session.delete(link)
+        db.session.commit()
+
+        return link_json
 
 
 def jsonify_list(objects):
