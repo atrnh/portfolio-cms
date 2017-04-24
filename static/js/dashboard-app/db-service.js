@@ -34,9 +34,11 @@
     var all;
     var undoIdx;
     var toDelete = [];
+    var ids;
 
     var promise = Category.getAll('true').$promise.then(function (categories) {
       all = categories;
+      ids = Object.keys(all);
     });
 
     return {
@@ -51,7 +53,6 @@
       },
 
       queueDelete: function(category) {
-        undoIdx = all.indexOf(category);
         toDelete.push(category);
 
         // If toDelete has more than one object in it, delete the oldest item
@@ -59,17 +60,14 @@
           this.commitDelete();
         }
 
-        if (undoIdx >= 0) {
-          all.splice(undoIdx, 1);
-        }
-
-        console.log(toDelete[toDelete.length - 1]);
+        this.remove(category);
 
         return toDelete[toDelete.length - 1];
       },
 
       undoDelete: function() {
-        all.splice(undoIdx, 0, toDelete[toDelete.length - 1]);
+        var toUndo = toDelete[toDelete.length - 1];
+        all[toUndo.id] = toUndo;
       },
 
       commitDelete: function() {
@@ -77,10 +75,7 @@
       },
 
       remove: function(category) {
-        var idx = all.indexOf(category);
-        if (idx >= 0) {
-          all.splice(idx, 1);
-        }
+        delete all[category.id];
       },
 
       insertAt: function(idx, category) {
@@ -88,31 +83,29 @@
       },
 
       push: function(category) {
-        all.push(category);
+        all[category.id] = category;
       },
 
       get: function(id) {
-        var found = all.find(function (category) {
-          return category.id === id;
-        });
-
-        return found;
+        return all[id];
       },
 
       addProjectTo: function(category, project) {
-        var idx = all.indexOf(category);
-        if (idx >= 0) {
-          all[idx].projects.push(project);
-        }
+        all[category.id].projects[project.id] = project;
+        console.log('project added');
       },
 
       removeProjectFrom: function(category, project) {
-        var cIdx = all.indexOf(category);
-        var pIdx = all[cIdx].projects.indexOf(project);
+        delete all[category.id].projects[project.id];
+        console.log('project deleted');
+      },
 
-        if (pIdx >= 0) {
-          all[cIdx].projects.splice(pIdx, 1);
-        }
+      getProjectById: function(category, pId) {
+        return all[category.id].projects[pId];
+      },
+
+      first: function() {
+        return all[ids[0]];
       }
     };
   }]);
