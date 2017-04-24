@@ -19,8 +19,7 @@ angular.module('dbResource', ['ngResource'])
       getAllInCategory: function(id) {
         return $resource('/projects.json', {categoryId: id}, {
           'get': {
-            method: 'GET',
-            isArray: true
+            method: 'GET'
           }
         }).get();
       },
@@ -29,8 +28,7 @@ angular.module('dbResource', ['ngResource'])
       getAll: function() {
         return $resource('/projects.json', {}, {
           'get': {
-            method: 'GET',
-            isArray: true
+            method: 'GET'
           }
         }).get();
       },
@@ -57,8 +55,7 @@ angular.module('dbResource', ['ngResource'])
       delete: function(id) {
         return $resource('/admin/project/:projectId', {projectId: id}, {
           'delete': {
-            method: 'DELETE',
-            isArray: true
+            method: 'DELETE'
           }
         }).delete();
       },
@@ -115,7 +112,15 @@ angular.module('dbResource', ['ngResource'])
         return $resource('/categories.json', {loadAll: loadAll}, {
           'get': {
             method: 'GET',
-            isArray: true,
+          }
+        }).get();
+      },
+
+      getAllList: function(loadAll) {
+        return $resource('/categories_list.json', {loadAll: loadAll}, {
+          'get': {
+            method: 'GET',
+            isArray: true
           }
         }).get();
       },
@@ -182,8 +187,7 @@ angular.module('dbResource', ['ngResource'])
       getAll: function() {
         return $resource('/all_media.json', {}, {
           'get': {
-            method: 'GET',
-            isArray: true
+            method: 'GET'
           }
         }).get();
       }
@@ -213,5 +217,97 @@ angular.module('dbResource', ['ngResource'])
       },
     };
   })
+
+  .factory('Page', ['$resource', function ($resource) {
+    return {
+      getAll: function() {
+        return $resource('/pages.json', {}, {
+          'get': {
+            method: 'GET',
+            isArray: true
+          }
+        }).get();
+      },
+
+      // Get page JSON by ID
+      getById: function(id) {
+        return $resource('/page.json', {pageId: id}, {
+          'get': {
+            method: 'GET'
+          }
+        }).get();
+      },
+
+      addNew: function(title, content) {
+        return $resource('/admin/page', {}, {
+          'post': {
+            method: 'POST'
+          }
+        }).post({}, {'title': title, 'content': content});
+      },
+
+      delete: function(id) {
+        return $resource('/admin/page/:pageId', {pageId: id}, {
+          'delete': {
+            method: 'DELETE'
+          }
+        }).delete();
+      },
+
+      update: function(id, obj) {
+        return $resource('/admin/page/:pageId', {pageId: id}, {
+          'post': {
+            method: 'POST'
+          }
+        }).post({}, obj);
+      },
+    };
+  }])
+
+  .factory('Link', ['$resource', function ($resource) {
+    return {
+      getAll: function() {
+        return $resource('/links.json', {}, {
+          'get': {
+            method: 'GET',
+            isArray: true
+          }
+        }).get();
+      },
+
+      // Get link JSON by ID
+      getById: function(id) {
+        return $resource('/link.json', {linkId: id}, {
+          'get': {
+            method: 'GET'
+          }
+        }).get();
+      },
+
+      addNew: function(title, url) {
+        return $resource('/admin/link', {}, {
+          'post': {
+            method: 'POST'
+          }
+        }).post({}, {'title': title, 'url': url});
+      },
+
+      delete: function(id) {
+        return $resource('/admin/link/:linkId', {pageId: id}, {
+          'delete': {
+            method: 'DELETE'
+          }
+        }).delete();
+      },
+
+      update: function(id, obj) {
+        return $resource('/admin/link/:linkId', {pageId: id}, {
+          'post': {
+            method: 'POST'
+          }
+        }).post({}, obj);
+      },
+    };
+  }])
 ;
 })(window.angular);

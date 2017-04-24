@@ -49,6 +49,16 @@ angular.module('dashboard', [
         controller: 'NewCategoryController'
       })
 
+      .when('/new/page', {
+        templateUrl: '/static/js/templates/new-page.html',
+        controller: 'NewPageController'
+      })
+
+      .when('/new/link', {
+        templateUrl: '/static/js/templates/new-link.html',
+        controller: 'NewLinkController'
+      })
+
       .when('/edit/category/:categoryId', {
           templateUrl: '/static/js/templates/edit-category.html',
           controller: 'EditCategoryController'
@@ -57,20 +67,53 @@ angular.module('dashboard', [
       .when('/edit/project/:projectId', {
         templateUrl: '/static/js/templates/edit-project.html'
       })
+
+      .when('/edit/page/:pageId', {
+        templateUrl: '/static/js/templates/edit-page.html',
+        controller: 'EditPageController'
+      })
+
+      .when('/edit/link/:linkId', {
+        templateUrl: '/static/js/templates/edit-link.html',
+        controller: 'EditLinkController'
+      })
       ;
+  }])
+
+  .filter('isEmpty', [function() {
+    return function(object) {
+      return object ? angular.equals({}, object) ||
+                      object.projects === null :
+                      true;
+    };
   }])
 
   .controller(
     'ProjectsController',
-    function ($scope, $route, Categories, Project) {
+    function ($scope, $route, Categories, Project, Page, Link) {
       var toDelete;
       var undoIdx;
       var undoType;
       var projects;
 
       $scope.showUndo = false;
+      $scope.accordion = {
+        isCategoriesOpen: true,
+        isPagesOpen: false,
+        isLinksOpen: false
+      };
 
       $scope.categories = Categories.all();
+
+      $scope.pages = Page.getAll().$promise.then(function (pages) {
+        $scope.pages = pages;
+      });
+
+      $scope.links = Link.getAll().$promise.then(function (links) {
+        $scope.links = links;
+      });
+
+      console.log($scope.accordion.isCategoriesOpen);
 
       $scope.queueDelete = function (type, obj, parent=null) {
         undoType = type;
@@ -79,12 +122,9 @@ angular.module('dashboard', [
           $scope.deletedName = Categories.queueDelete(obj).title;
         } else if (type === 'project') {
           toDelete = obj;
-          var parentIdx = $scope.categories.indexOf(parent);
-          projects = $scope.categories[parentIdx].projects;
-          undoIdx = projects.indexOf(obj);
-          if (undoIdx >= 0) {
-            projects.splice(undoIdx, 1);
-          }
+          projects = Categories.all()[parent.id].projects;
+          delete projects[obj.id];
+          undoIdx = projects.id;
         }
 
         $scope.showUndo = true;
@@ -94,7 +134,7 @@ angular.module('dashboard', [
         if (undoType === 'category') {
           Categories.undoDelete();
         } else if (undoType === 'project') {
-          projects.splice(undoIdx, 0, toDelete);
+          projects[toDelete.id] = toDelete;
         }
 
         $scope.showUndo = false;
@@ -104,7 +144,9 @@ angular.module('dashboard', [
         if (undoType === 'category') {
           Categories.commitDelete();
         } else if (undoType === 'project') {
-          Project.delete(toDelete.id);
+          Project.delete(toDelete.id).$promise.then(function (project) {
+            console.log('project deleted');
+          });
         }
 
         $scope.showUndo = false;
@@ -116,7 +158,7 @@ angular.module('dashboard', [
     $scope.pendingTags = [];
 
     $scope.categories = Categories.all();
-    $scope.thisCategory = $scope.categories[0];
+    $scope.thisCategory = Categories.first();
 
     $scope.tags = Tag.getAll().$promise.then(function (tags) {
       $scope.tags = tags;
@@ -165,21 +207,24 @@ angular.module('dashboard', [
 
     $scope.id = $routeParams.projectId;
     var categoryCopy;
+    var projectCopy;
 
     $scope.tags = Tag.getAll().$promise.then(function (tags) {
       $scope.tags = tags;
     });
 
     Project.getById($scope.id).$promise.then(function (project) {
-      $scope.project = project;
-      $scope.project.media = project.media.map(function (m) {
-        m.open = false;
-        return m;
+      var keys = Object.keys(project.categories);
+      Object.keys(project.media).map(function (m) {
+        project.media[m].open = false;
       });
 
+      $scope.project = project;
+
       $scope.categories = Categories.all();
-      $scope.thisCategory = Categories.get(project.categories[0].id);
-      categoryCopy = $scope.thisCategory;
+      categoryCopy = Categories.get(project.categories[keys[0]].id);
+      projectCopy = Categories.getProjectById(categoryCopy, project.id);
+      $scope.thisCategory = categoryCopy;
     });
 
     $scope.update = function(prop, value) {
@@ -189,7 +234,7 @@ angular.module('dashboard', [
         .$promise.then(function (resp) {
           if (prop === 'categoryId') {
             Categories.addProjectTo($scope.thisCategory, $scope.project);
-            Categories.removeProjectFrom(categoryCopy, $scope.project);
+            Categories.removeProjectFrom(categoryCopy, projectCopy);
           }
           $scope.project[prop] = value;
         });
@@ -262,5 +307,47 @@ angular.module('dashboard', [
       });
     };
   })
+
+  .controller('NewPageController', ['$scope', 'Page', '$location', function ($scope, Page, $location) {
+    $scope.addPage = function(title, content) {
+      Page.addNew(title, content).$promise.then(function (page) {
+        $location.path('/');
+      });
+    };
+  }])
+
+  .controller('EditPageController', ['$scope', '$routeParams', 'Page', function ($scope, $routeParams, Page) {
+    var id = parseInt($routeParams.pageId, 10);
+    $scope.page = Page.getById(id);
+
+    $scope.update = function (prop, value) {
+      var obj = {};
+      obj[prop] = value;
+      Page.update(id, obj).$promise.then(function (project) {
+        $scope.page[prop] = value;
+      });
+    };
+  }])
+
+  .controller('NewLinkController', ['$scope', 'Link', '$location', function ($scope, Link, $location) {
+    $scope.addLink = function(title, url) {
+      Link.addNew(title, url).$promise.then(function (link) {
+        $location.path('/');
+      });
+    };
+  }])
+
+  .controller('EditLinkController', ['$scope', '$routeParams', 'Link', function ($scope, $routeParams, Link) {
+    var id = parseInt($routeParams.linkId, 10);
+    $scope.link = Link.getById(id);
+
+    $scope.update = function (prop, value) {
+      var obj = {};
+      obj[prop] = value;
+      Link.update(id, obj).$promise.then(function (link) {
+        $scope.link[prop] = value;
+      });
+    };
+  }])
 ;
 })(window.angular);

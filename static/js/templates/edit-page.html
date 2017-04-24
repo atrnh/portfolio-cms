@@ -1,0 +1,16 @@
+<section>
+  <h2>Edit Page</h2>
+  <h3>
+    <editable-field field-type="text"
+                    field-value="page.title"
+                    on-update="update('title', value)">
+    </editable-field>
+  </h3>
+  <p>
+    <editable-field field-type="textarea"
+                    field-value="page.content"
+                    enable-html="true"
+                    on-update="update('content', value)">
+    </editable-field>
+  </p>
+</section>
