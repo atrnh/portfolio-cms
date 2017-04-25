@@ -3,3 +3,4 @@ env
 static/js/demo.js
 static/ng-file-upload-bower-12.2.13
 static/images
+*.txt
