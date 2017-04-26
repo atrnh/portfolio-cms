@@ -25,7 +25,7 @@ A lightweight web content management system for creative professionals and hobby
   * `createdb portfolio`
 * Create necessary tables in the database
   * `python -i model.py`
-  `db.create_all()`
+  * `db.create_all()`
 * Start server
   * `python server.py`
 * View pubilc portfolio page at `localhost:5000` or admin dashboard at `localhost:5000/admin/dashboard`
