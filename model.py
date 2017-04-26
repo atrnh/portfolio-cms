@@ -15,10 +15,16 @@ class JSONMixin(object):
     """JSON helper mixins."""
 
     @staticmethod
-    def get_json_from_list(instances, make_list=False):
+    def get_json_from_list(instances, make_list=False, get_projects_object=None):
         """Return JSON of a list of instances."""
 
         if not make_list:
+            if get_projects_object is not None:
+                return json.dumps(
+                    {inspect(instance).identity[0]:
+                     json.loads(instance.get_attributes(get_projects_object))
+                     for instance in instances}
+                )
             return json.dumps(
                 {inspect(instance).identity[0]:
                  json.loads(instance.get_attributes())
@@ -26,6 +32,11 @@ class JSONMixin(object):
             )
 
         else:
+            if get_projects_object is not None:
+                return json.dumps(
+                    [json.loads(instance.get_attributes(get_projects_object))
+                     for instance in instances]
+                )
             return json.dumps(
                 [json.loads(instance.get_attributes())
                  for instance in instances]
