@@ -1,0 +1,199 @@
+#dashboard {
+  flex: 1;
+}
+
+#placeholder {
+  flex: 3;
+}
+
+#dashboard-nav ul {
+  list-style: none;
+  padding: 0;
+  margin-bottom: 0;
+  margin-top: 10px;
+  border: 1px solid transparent;
+  border-bottom-color: black;
+}
+
+#dashboard-nav li {
+  display: inline;
+  padding: 10px 20px 0 20px;
+  border: 1px solid black;
+  border-bottom-color: transparent;
+  border-bottom-width: 2px;
+  background-color: white;
+}
+
+#dashboard-nav li + li {
+  margin-left: 5px;
+}
+
+#add-new-menu {
+  padding: 10px;
+  margin-bottom: 15px;
+  border: 1px solid black;
+}
+
+#add-new {
+  font-size: 0.8rem;
+}
+
+#add-project {
+  margin: 0 5px 0 10px;
+}
+
+#add-new-menu a + a {
+  margin: 0 10px;
+  font-size: 0.8rem;
+}
+
+.panel {
+  box-shadow: none;
+}
+
+.panel-group .panel {
+  border-radius: 0;
+}
+
+.panel-default {
+  border-color: black;
+}
+
+.panel-default > .panel-heading {
+  color: black;
+  background-color: white;
+  border-color: black;
+}
+
+.panel-default > .panel-heading + .panel-collapse > .panel-body {
+  border-top-color: black;
+}
+
+h1 {
+  margin-bottom: 20px;
+}
+
+#dashboard-view-content {
+  padding-top: 20px;
+  width: 100%;
+  max-width: 400px;
+}
+
+#dashboard-nav li.inactive-tab {
+  border-bottom-width: 1px;
+  border-bottom-color: black;
+}
+
+img {
+  width: 100%;
+  height: auto;
+}
+
+textarea {
+  width: 100%;
+  max-width: 400px;
+  height: 150px;
+  border-radius: 0;
+  border: 1px solid rgba(0, 0, 0, 0.3);
+}
+
+.edit-section span {
+  display: inline-block;
+  width: 340px;
+  padding: 2px;
+}
+
+.edit-section input {
+  display: inline-block;
+}
+
+.edit-section button {
+  font-size: 12px;
+  border: 1px solid black;
+  background: none;
+  padding: 2px 5px;
+  float: right;
+  margin-top: 5px;
+}
+
+.tag-input {
+  width: 350px;
+  padding: 10px;
+  padding-bottom: 0px;
+  border: 1px solid black;
+}
+
+.tag-input button {
+  float: none;
+  margin-top: 0;
+}
+
+.tag-input button:hover {
+  color: red;
+  border-color: red;
+}
+
+.tag-input button + button {
+  margin-left: 3px;
+}
+
+.tag-input input {
+  border: none;
+  font-size: 16px;
+  margin: 10px 0px 5px 0px;
+}
+
+.tag-group {
+  height: 70px;
+}
+
+.tag-input .dropdown-menu {
+  border-radius: 0;
+  border: 1px solid black;
+}
+
+.tag-input .dropdown-menu > .active > a {
+  background-color: rgba(0, 0, 0, 0.3);
+}
+
+input {
+  border-radius: 0;
+  border: 1px solid rgba(0, 0, 0, 0.3);
+}
+
+/*select {
+  margin-left: 15px;
+  border-radius: 0;
+  background-color: white;
+}*/
+
+#file-select {
+  border: none;
+}
+
+#edit-media .panel-group .panel {
+  margin-bottom: 5px;
+}
+
+#categories .btn {
+  border-radius: 0;
+  border: 1px solid black;
+  font-size: 10px;
+  padding: 3px 5px;
+  line-height: 1;
+  margin-right: 10px;
+  background: none;
+}
+
+#categories .btn:hover {
+  color: red;
+  border-color: red;
+}
+
+#categories ul {
+  list-style: none;
+}
+
+#categories > li {
+  margin-bottom: 10px;
+}

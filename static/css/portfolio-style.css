@@ -1,24 +1,5 @@
-html, body {
-  width: 100%;
+.container-fluid {
   height: 100%;
-  margin: 0;
-  padding: 0;
-  font-size: 100%;
-}
-
-.flex-row {
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-}
-
-.flex-column {
-  display: flex;
-  flex-direction: column;
-}
-
-.center-content {
-  justify-content: center;
 }
 
 .nav {
@@ -31,10 +12,19 @@ html, body {
   cursor: auto;
 }
 
+#portfolio-container {
+  height: 100%;
+}
+
 .content {
   width: 75%;
   margin-left: 25%;
   padding: 2%;
+  height: 100%;
+}
+
+.content > div {
+  height: 100%;
 }
 
 nav#main-nav {
@@ -48,13 +38,17 @@ nav#main-nav {
   margin: 0;
 }
 
-#main-nav ul {
-  width: 80%;
+#main-nav > ul {
+  width: 70%;
+  margin-left: 40px;
 }
 
 #main-nav a {
   text-decoration: none;
   color: #000;
+}
+
+#home-link {
   font-weight: bold;
 }
 
@@ -81,13 +75,13 @@ nav#main-nav {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  flex: 10;
-  font-size: 1.5rem;
+  flex: 15;
+  font-size: 0.9rem;
 }
 
 .nav-panel-heading .nav-expand {
   flex: 1;
-  font-size: 1rem;
+  font-size: 10px;
 }
 
 .nav-expand i {
@@ -95,26 +89,96 @@ nav#main-nav {
 }
 
 .nav-expand i:hover {
-  color: yellow;
+  color: #a1a1a1;
 }
 
 .projects li {
-  margin-left: 50px;
+  margin-left: 25px;
+}
+
+#home-link {
+  padding-bottom: 5px;
+  border: 1px solid transparent;
+  border-bottom-color: black;
+  margin-bottom: 15px;
+  text-transform: uppercase;
+  letter-spacing: -0.1rem;
 }
 
 #home-link a {
-  font-size: 2.5rem;
+  font-size: 1.1rem;
 }
 
-/*#portfolio-main li {
-  flex: 1 1;
-  height: 500px;
-}*/
-
 .image-container {
-  margin: 1rem;
+  margin: 0.3rem;
 }
 
 .image-container img {
   height: 300px;
+}
+
+#nav-links {
+  margin-top: 50px;
+}
+
+#nav-links ul li a {
+  font-size: 0.8rem;
+  font-weight: normal;
+  color: #337ab7;
+}
+
+#nav-pages {
+  margin-top: 1em;
+  font-size: 0.9rem;
+}
+
+.projects li a {
+  font-size: 0.85rem;
+}
+
+#projects-list {
+  padding-left: 0;
+  list-style: none;
+  flex: 1;
+  height: 100%;
+}
+
+#projects-list li {
+  width: 500px;
+  height: 300px;
+}
+
+#projects-list li img {
+  width: 100%;
+}
+
+.project-title {
+  padding: 20px;
+  margin: 0;
+}
+
+.img-hover a {
+  color: transparent;
+  transition: color 0.3s;
+}
+
+.img-hover {
+  cursor: pointer;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.0);
+  justify-content: flex-end;
+  transition: background-color 0.3s;
+}
+
+.img-hover:hover {
+  background-color: rgba(0,0,0,0.8);
+}
+
+.img-hover:hover a {
+  color: white;
+}
+
+.img-li + .img-li {
+  margin-left: 10px;
 }
