@@ -36,7 +36,7 @@ angular.module('portfolio', ['dbResource', 'ngRoute', 'ngSanitize', 'ui.bootstra
     var self = this;
     Category.getAllList().$promise.then(function (categories) {
       for (let i = 0; i < categories.length; i++) {
-        categories[i].open = true;
+        categories[i].open = false;
       }
 
       self.categories = categories;
@@ -56,12 +56,25 @@ angular.module('portfolio', ['dbResource', 'ngRoute', 'ngSanitize', 'ui.bootstra
     };
   }])
 
-  .controller('CategoryViewController', function ($scope, $routeParams, Category) {
+  .controller('CategoryViewController', function ($scope, $routeParams, Category, $location) {
     Category.getById($routeParams.id)
       .$promise.then(function (category) {
         $scope.category = category;
       }
     );
+
+    $scope.setImg = function (url) {
+      var css = {};
+      css['background'] = 'rgba(0,0,0,0) no-repeat center center';
+      css['background-image'] = 'url(/' + url + ')';
+
+      return css;
+    };
+
+    $scope.goTo = function (projectTitle, projectId) {
+      var url = '/project/' + projectTitle + '/' + projectId;
+      $location.path(url);
+    };
   })
 
   .controller('ProjectViewController', function ($scope, $routeParams, Project) {
@@ -71,6 +84,8 @@ angular.module('portfolio', ['dbResource', 'ngRoute', 'ngSanitize', 'ui.bootstra
         var tags = project.tags.map(function (tag) {
           return tag.code;
         });
+
+        console.log(tags);
         $scope.lastTag = tags.pop();
         $scope.tags = tags;
       }
@@ -88,6 +103,7 @@ angular.module('portfolio', ['dbResource', 'ngRoute', 'ngSanitize', 'ui.bootstra
   .controller('MainViewController', function ($scope, Media) {
     Media.getAll().$promise.then(function (media) {
       $scope.recentMedia = media;
+      console.log(media);
     });
   })
 

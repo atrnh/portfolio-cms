@@ -37,6 +37,12 @@
     var ids;
 
     var promise = Category.getAll('true').$promise.then(function (categories) {
+      for (let category in categories) {
+        if (category.projects === undefined) {
+          category.projects = {};
+        }
+      }
+
       all = categories;
       ids = Object.keys(all);
     });
@@ -92,7 +98,7 @@
 
       addProjectTo: function(category, project) {
         all[category.id].projects[project.id] = project;
-        console.log('project added');
+        console.log(all[category.id].projects);
       },
 
       removeProjectFrom: function(category, project) {
@@ -106,6 +112,11 @@
 
       first: function() {
         return all[ids[0]];
+      },
+
+      updateProject: function(category, pId, prop, value) {
+        var project = this.getProjectById(categrory, pId);
+        project[prop] = value;
       }
     };
   }]);

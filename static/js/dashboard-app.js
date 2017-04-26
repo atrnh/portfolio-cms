@@ -236,6 +236,7 @@ angular.module('dashboard', [
             Categories.addProjectTo($scope.thisCategory, $scope.project);
             Categories.removeProjectFrom(categoryCopy, projectCopy);
           }
+          Categories.updateProject($scope.thisCategory, $scope.project.id, prop, value);
           $scope.project[prop] = value;
         });
     };

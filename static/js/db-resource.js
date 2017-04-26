@@ -187,7 +187,8 @@ angular.module('dbResource', ['ngResource'])
       getAll: function() {
         return $resource('/all_media.json', {}, {
           'get': {
-            method: 'GET'
+            method: 'GET',
+            isArray: true
           }
         }).get();
       }
