@@ -2,15 +2,22 @@
   <h2>~*~* category.title *~*~</h2>
   <p ng-bind-html="category.desc"></p>
 
-  <div>
-    <ul ng-show="category.projects">
-      <li ng-repeat="project in category.projects">
-        <h3>
-          <a ng-href="#/project/~*~* project.title *~*~/~*~* project.id *~*~">
-            ~*~* project.title *~*~
-          </a>
+  <div id="projects-container" class="flex-row">
+    <ul id="projects-list"
+        ng-show="category.projects"
+        class="flex-row">
+      <li ng-repeat="project in category.projects"
+          ng-style="setImg(project.main_img.source_url)"
+          class="img-li">
+        <div class="flex-column img-hover"
+             ng-click="goTo(project.title, project.id)">
+        <!-- <img ng-src="/~*~* project.main_img.source_url *~*~" /> -->
+        <h3 class="project-title">
+            <a ng-href="#/project/~*~* project.title *~*~/~*~* project.id *~*~">
+              ~*~* project.title *~*~
+            </a>
         </h3>
-        <img ng-src="/~*~* project.main_img.source_url *~*~" />
+        </div>
       </li>
     </ul>
   </div>

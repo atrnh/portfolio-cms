@@ -1,12 +1,14 @@
 <section ng-controller="EditProjectController">
   <h2>Edit Project</h2>
+  <div class="edit-section">
   <h3>
     <editable-field field-type="text"
                     field-value="project.title"
                     on-update="update('title', value)">
     </editable-field>
   </h3>
-  <section id="project-data">
+  </div>
+  <section id="project-data" class="edit-section">
       <b><i>Description:</i></b></br>
       <editable-field field-type="textarea"
                       field-value="project.desc"
@@ -20,11 +22,13 @@
               ng-change="update('categoryId', thisCategory.id)">
       </select></br>
       <b>Tags:</b>
-      <div id="tag-input">
-        <button ng-repeat="tag in project.tags"
-                ng-click="deleteTag(tag)">
-          x ~*~* tag.code *~*~
-        </button>
+      <div class="tag-input">
+        <div class="tag-group">
+          <button ng-repeat="tag in project.tags"
+                  ng-click="deleteTag(tag)">
+            x ~*~* tag.code *~*~
+          </button>
+        </div>
         <input type="text"
                placeholder="New Tags"
                ng-model="newTag"
@@ -36,14 +40,13 @@
   </section>
 
   </br>
-  <input type="file" ngf-select ng-model="imageFile" name="file"
-             accept="image/*" ngf-max-size="20MB" />
-  <button ng-click="upload(imageFile)">Upload</button></br>
+  <section class="edit-section">
+    <input id="file-select" type="file" ngf-select ng-model="imageFile" name="file"
+               accept="image/*" ngf-max-size="20MB" />
+    <button ng-click="upload(imageFile)">Upload</button></br>
+  </section>
 
   <section id="edit-media">
-    <p>
-      Current main image: ~*~* project.main_img_id *~*~
-    </p>
     <uib-accordion close-others="true">
       <span ng-repeat="media in project.media">
         <div uib-accordion-group class="panel-default" is-open="media.open">

@@ -1,7 +1,7 @@
 <section id="add-new-menu">
   <span>
-    Add new:
-    <a href="#/new/project">Project</a> /
+    <span id="add-new">Add new:</span>
+    <a id="add-project" href="#/new/project">Project</a> /
     <a href="#/new/category">Category</a> /
     <a href="#/new/page">Page</a> /
     <a href="#/new/link">Link</a>
@@ -32,22 +32,22 @@
         <li ng-repeat="(id, category) in categories"
             class="category">
           <span>
+            <button class="btn" ng-if="category.projects | isEmpty" ng-click="queueDelete('category', category)">
+              delete
+            </button>
             <a ng-href="#/edit/category/~*~* category.id *~*~">
               ~*~* category.title *~*~
             </a>
-            <button ng-if="category.projects | isEmpty" ng-click="queueDelete('category', category)">
-              x
-            </button>
           </span>
           <ul ng-show="category.projects">
             <li ng-repeat="project in category.projects">
               <span>
+                <button class="btn" ng-click="queueDelete('project', project, category)">
+                  delete
+                </button>
                 <a ng-href="#/edit/project/~*~* project.id *~*~">
                   ~*~* project.title *~*~
                 </a>
-                <button ng-click="queueDelete('project', project, category)">
-                  x
-                </button>
               </span>
             </li>
           </ul>
