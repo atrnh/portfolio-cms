@@ -41,6 +41,7 @@ A lightweight web content management system for creative professionals and hobby
 
 ## <a name="todo"></a>TODO
 * You can't actually "just slap it on your server" at the moment but soon I will minimize the amount of setup you'd have to do
-* Security is bad
+* Security is bad - haven't implemented good password hashing yet
 * Leverage use of global resolves/service to minimize work on the server and database
 * UI style is inconsistent in some places
+* Render live preview of portfolio on the dashboard
