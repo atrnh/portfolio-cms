@@ -21,14 +21,16 @@
   <script src="/static/js/dashboard-app.js"></script>
   <script src="/static/js/editable-field-component.js"></script>
 
+  <link rel="stylesheet" href="/static/css/normalize.css" />
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" />
-  <!-- This is so that the bootstrap css will work with angular -->
-  <style>
-    .nav, .pagination, .carousel, .panel-title a { cursor: pointer; }
-  </style>
+  <link rel="stylesheet" href="/static/css/ng-bootstrap.css"  />
+  <link rel="stylesheet" href="/static/css/helpers.css" />
+  <link rel="stylesheet" href="/static/css/admin.css" />
 </head>
 
 <body ng-app="dashboard">
-  {% block content %}{% endblock %}
+  <div class="container-fluid">
+    {% block content %}{% endblock %}
+  </div>
 </body>
 </html>

@@ -2,12 +2,22 @@
 {% block title %}Dashboard{% endblock %}
 
 {% block content %}
-  <div id="dashboard">
+<div class="flex-row center-content">
+  <section id="dashboard" class="flex-column center-content">
     <h1>Dashboard</h1>
     <nav id="dashboard-nav">
-      <li><a href="#/">Projects</a></li>
-      <li><a href="#/settings">Settings</a></li>
+      <ul>
+        <li><a href="#/">Projects</a></li>
+        <li class="inactive-tab"><a href="#/settings">Settings</a></li>
+      </ul>
     </nav>
-    <div ng-view></div>
-  </div>
+    <div id="dashboard-view-content" ng-view></div>
+  </section>
+
+  <section id="placeholder">
+    <p>
+      
+    </p>
+  </section>
+</div>
 {% endblock %}
