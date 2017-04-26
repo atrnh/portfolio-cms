@@ -161,9 +161,9 @@ def get_all_media_json():
 
     all_media = Media.query.options(
         db.joinedload('projects')
-    ).order_by(Media.date_updated).limit(6).all()
+    ).order_by(Media.date_updated.desc()).limit(6).all()
 
-    return jsonify_list(Media.get_json_from_list(all_media))
+    return jsonify_list(Media.get_json_from_list(all_media, True, False))
 
 
 @app.route('/tags.json')
@@ -584,7 +584,7 @@ def jsonify_list(objects):
 
 
 if __name__ == '__main__':
-    app.debug = True
+    app.debug = False
     app.jinja_env.auto_reload = app.debug
 
     connect_to_db(app)
