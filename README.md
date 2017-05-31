@@ -21,14 +21,27 @@ A lightweight web content management system for creative professionals and hobby
 
 ## <a name="build"></a>How to build locally
 * Create and activate your virtual environment
-  * `virtualenv -p /usr/bin/python2.7 <path/to/virtualenv>`
+  ```
+  virtualenv -p /usr/bin/python2.7 <path/to/virtualenv>
+  source <path/to/virtualenv>/bin/activate
+  ```
+* Install dependencies
+  ```
+  pip install -r requirements.txt
+  ```
 * Make sure you have PostgreSQL installed, then create a database called `portfolio`
-  * `createdb portfolio`
+  ```
+  createdb portfolio
+  ```
 * Create necessary tables in the database
-  * `python -i model.py`
-  * `db.create_all()`
+  ```
+  python -i model.py
+  db.create_all()
+  ```
 * Start server
-  * `python server.py`
+  ```
+  python server.py
+  ```
 * View pubilc portfolio page at `localhost:5000` or admin dashboard at `localhost:5000/admin/dashboard`
 
 ## <a name="notes"></a>Notable features
