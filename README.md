@@ -3,8 +3,7 @@
 -- Dieter Rams
 
 # Portfolio CMS
-![screencast gif](screenshots/screencast.gif)
-![Public portfolio screenshot](screenshots/public_portfolio.png)
+![screencast gif](screenshots/screencast.gif) ![Public portfolio screenshot](screenshots/public_portfolio.png)
 A lightweight web content management system for creative professionals and hobbyists.
 
 ## Contents
