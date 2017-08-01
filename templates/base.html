@@ -3,82 +3,15 @@
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{% block title %}{% endblock %}</title>
-  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.1/angular.js"></script>
-  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.1/angular-route.js"></script>
-  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.1/angular-resource.js"></script>
-  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.1/angular-sanitize.js"></script>
-  <script src="/static/js/ui-bootstrap-tpls-2.5.0.min.js"></script>
-  <script src="/static/js/db-resource.js"></script>
-  <script src="/static/js/portfolio-app.js"></script>
 
   <link rel="stylesheet" href="/static/css/normalize.css" />
-
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" />
-
-  <link rel="stylesheet" href="/static/css/ng-bootstrap.css"  />
-  <link rel="stylesheet" href="/static/css/helpers.css" />
-  <link rel="stylesheet" href="/static/css/portfolio-style.css" />
+  <link
+    rel="stylesheet"
+    href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+    />
 </head>
 
-<body ng-app="portfolio">
-<div class="container-fluid">
-  <div class="flex-row" id="portfolio-container">
-    <div id="nav-container" class="flex-column nav center-content">
-      <nav class="flex-row"
-           id="main-nav"
-           ng-controller="IndexViewController as index">
-        <ul>
-          <li id="home-link">
-            <a href="/">Portfolio CMS</a>
-          </li>
-          <li ng-show="index.categories">
-            <uib-accordion close-others="false">
-              <div uib-accordion-group
-                   class="nav-panel"
-                   ng-repeat="category in index.categories"
-                   is-open="category.open"
-                   template-url="/static/js/templates/nav-accordion.html">
-                <uib-accordion-heading>
-                  <a ng-href="#/category/~*~* category.title *~*~/~*~* category.id *~*~">
-                    ~*~* category.title *~*~
-                  </a>
-                </uib-accordion-heading>
-                <ul class="projects" ng-show="category.projects">
-                  <li ng-repeat="project in category.projects">
-                    <a ng-href="#/project/~*~* project.title *~*~/~*~* project.id *~*~">
-                      ~*~* project.title *~*~
-                    </a>
-                  </li>
-                </ul>
-              </div> <!-- end accordion panel -->
-            </uib-accordion>
-          </li>
-
-          <li id="nav-pages">
-            <ul>
-              <li ng-repeat="page in index.pages">
-                <a ng-href="#/page/~*~* page.title *~*~/~*~* page.id *~*~">
-                  ~*~* page.title *~*~
-                </a>
-              </li>
-            </ul>
-          </li>
-
-          <li id="nav-links">
-            <ul>
-              <li ng-repeat="link in index.links">
-                <a ng-href="http://~*~* link.url *~*~" target="_self">
-                  ~*~* link.title *~*~
-                </a>
-              </li>
-            </ul>
-          </li>
-      </nav>
-    </div>
-    <div class="flex-column content">
-      {% block content %}{% endblock %}
-    </div>
-  </div>
-</div>
+<body>
+  {% block content %}{% endblock %}
 </body>
 </html>
