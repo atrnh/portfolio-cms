@@ -15,10 +15,12 @@ class JSONMixin(object):
     """JSON helper mixins."""
 
     @staticmethod
-    def get_json_from_list(instances, make_list=False, get_projects_object=None):
-        """Return JSON of a list of instances."""
+    def get_json_from_list(instances,
+                           make_js_list=False,
+                           get_projects_object=None):
+        """Return JSON of database instances."""
 
-        if not make_list:
+        if not make_js_list:
             if get_projects_object is not None:
                 return json.dumps(
                     {inspect(instance).identity[0]:
@@ -167,24 +169,30 @@ class Category(db.Model, JSONMixin):
                                                          title=self.title,
                                                          )
 
+
+    @staticmethod
+    def make_db_options(max_nest=0):
+        if max_nest <= 0:
+            return None
+        elif max_nest == 1:
+            return db.joinedload('projects')
+        elif max_nest == 2:
+            return (db.joinedload('projects')
+                      .joinedload('media'))
+
+
     @classmethod
-    def load_with_projects_media(cls):
-        """Return categories with nested projects and media."""
+    def load_from_db(cls, max_nest=0, include_main_imgs=False):
+        """Return categories with nested instances."""
 
-        categories = cls.query.options(
-            db.joinedload('projects')
-              .joinedload('media')
-        ).order_by(Category.id).all()
+        options = cls.make_db_options(max_nest)
+        if include_main_imgs:
+            options = options.joinedload('main_img')
 
-        return categories
-
-    @classmethod
-    def load_with_projects(cls):
-        """Return categories with nested projects."""
-
-        categories = cls.query.options(
-            db.joinedload('projects')
-        ).order_by(Category.id).all()
+        if max_nest:
+            categories = cls.query.options(options).order_by(cls.id).all()
+        else:
+            categories = cls.query.order_by(cls.id).all()
 
         return categories
 
