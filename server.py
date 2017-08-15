@@ -47,7 +47,7 @@ def view_portfolio():
     Display all categories and their projects in the database.
     """
 
-    categories = Category.load_from_db(1)
+    categories = Category.get_all(1)
 
     return render_template('portfolio.html', categories=categories)
 
@@ -66,26 +66,23 @@ def get_categories_json(max_nest=None):
     """
 
     if max_nest is None:
-        max_nest = request.args.get('max_nest')
+        max_nest = request.args.get('max_nest') or 0
 
-    if max_nest:
-        categories = Category.load_from_db(int(max_nest))
-    else:
-        categories = Category.load_from_db()
+    categories = Category.get_all(int(max_nest))
 
     return jsonify_list(Category.get_json_from_list(categories))
 
 
-@app.route('/category.json')
-def get_category_json(category_id=None, max_nest=None, include_main_imgs=False):
+@app.route('/category/<category_id>.json')
+def get_category_json(category_id, max_nest=None, include_main_imgs=False):
     """Return JSON of specified category.
 
     Resource URL
-    /category.json/:id
+    /category/:category_id.json
 
     Parameters
     Name               Required       Desc
-    id                 req            Numerical ID of desired category
+    category_id        req            Numerical ID of desired category
     max_nest           opt            Number between 0-2 indicating how far down
                                       the relational chain the query should go
     include_main_imgs  opt            When set to True or t, category will
@@ -93,16 +90,41 @@ def get_category_json(category_id=None, max_nest=None, include_main_imgs=False):
                                       contains the id of the main_img
     """
 
-    category_id = category_id or request.args.get('id')
-    max_nest = request.args.get('max_nest') or 0
+    if max_nest is None:
+        max_nest = request.args.get('max_nest') or 0
+
     include_main_imgs = (request.args.get('include_main_imgs')
                          or include_main_imgs)
+
     if include_main_imgs == 't':
         include_main_imgs = True
 
-    category = Category.load_from_db(int(max_nest), include_main_imgs)
+    category = Category.get_all(int(max_nest), include_main_imgs)
 
     return jsonify_list(category.get_attributes())
+
+
+@app.route('/category/<category_id>/projects.json')
+def get_category_projects_json(category_id, include_main_imgs=False):
+    """Return JSON of all projects belonging to a category.
+
+    Resource URL
+    /category/:category_id/projects.json
+
+    Parameters
+    Name               Required       Desc
+    category_id        req            Numerical ID of desired category
+    include_main_imgs  opt            When set to True or t, projects will
+                                      include the main_image_id node which
+                                      contains the id of the main_img
+    """
+
+    include_main_imgs = (request.args.get('include_main_imgs')
+                         or include_main_imgs)
+
+    projects = Category.get_one(category_id, 1, include_main_imgs)
+
+
 
 
 @app.route('/projects.json')
