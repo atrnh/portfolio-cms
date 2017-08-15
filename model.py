@@ -171,30 +171,54 @@ class Category(db.Model, JSONMixin):
 
 
     @staticmethod
-    def make_db_options(max_nest=0):
+    def _make_options(max_nest=0, include_main_imgs=False):
+        """For use with cls.get_all() to generate options for query."""
+
+        options = None
+
         if max_nest <= 0:
-            return None
+            return options
         elif max_nest == 1:
-            return db.joinedload('projects')
+            options = db.joinedload('projects')
         elif max_nest == 2:
-            return (db.joinedload('projects')
-                      .joinedload('media'))
+            options = (db.joinedload('projects')
+                         .joinedload('media'))
+
+        if include_main_imgs:
+            options = options.joinedload('main_img')
+        else:
+            return options
+
+        return options
 
 
     @classmethod
-    def load_from_db(cls, max_nest=0, include_main_imgs=False):
+    def get_all(cls, max_nest=0, include_main_imgs=False):
         """Return categories with nested instances."""
 
-        options = cls.make_db_options(max_nest)
-        if include_main_imgs:
-            options = options.joinedload('main_img')
+        options = cls._make_options(max_nest, include_main_imgs)
 
-        if max_nest:
+        if options:
             categories = cls.query.options(options).order_by(cls.id).all()
         else:
             categories = cls.query.order_by(cls.id).all()
 
         return categories
+
+    @classmethod
+    def get_one(cls, category_id, max_nest=0, include_main_imgs=False):
+        """Return specified category."""
+
+        options = cls._make_options(max_nest, include_main_imgs)
+
+        if options:
+            category = cls.query.options(
+                options
+                ).filter_by(id=category_id).one()
+        else:
+            category = cls.query.filter_by(id=category_id).one()
+
+        return category
 
 
 class Project(db.Model, JSONMixin):
