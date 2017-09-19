@@ -122,39 +122,48 @@ def get_category_projects_json(category_id, include_main_imgs=False):
     include_main_imgs = (request.args.get('include_main_imgs')
                          or include_main_imgs)
 
-    projects = Category.get_one(category_id, 1, include_main_imgs)
+    projects = Category.get_one(category_id, 1, include_main_imgs).projects
 
-
+    return jsonify_list(Project.get_json_from_list(projects))
 
 
 @app.route('/projects.json')
-def get_category_projects_json():
-    """Return JSON object of all projects.
+def get_projects_json():
+    """Return JSON of all projects.
 
-    If categoryId is given in the request, return list of only projects
-    associated with that category. If not, return list of all projects.
+    Resource URL
+    /projects.json
+
+    Parameters
+    Name        Required       Desc
     """
 
-    category_id = request.args.get('categoryId')
+    projects = Project.query.all()
 
-    if category_id:
-        category_projects = Category.query.options(
-            db.joinedload('projects')
-        ).filter_by(id=category_id).one().projects
-
-        return jsonify_list(
-            Project.get_json_from_list(category_projects)
-        )
-
-    else:
-        projects = Project.query.all()
-
-        return jsonify_list(Project.get_json_from_list(projects))
+    return jsonify_list(Project.get_json_from_list(projects))
 
 
-@app.route('/project.json')
-def get_project_json(project_id=None):
-    """Return JSON project."""
+@app.route('/project/<project_id>.json')
+def get_project_json(project_id):
+    """Return JSON of specified project.
+
+    Resource URL
+    /project/:project_id.json
+
+    Parameters
+    Name                Required       Desc
+    project_id          req            Numerical ID of desired project
+    include_categories  opt            When set to True or t, project will
+                                       include the categories node which is an
+                                       array of categories related to the
+                                       project
+    include_media       opt            When set to True or t, project will
+                                       include media node which is an array of
+                                       media related to the project
+    include_tags        opt            When set to True or t, project will
+                                       include tags node which is an array of
+                                       tags related to the project
+    """
 
     if not project_id:
         project_id = request.args.get('projectId')
